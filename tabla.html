@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla de Presupuesto</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Iconos para iOS -->
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Habilitar modo pantalla completa en iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MiCalendario">
+
+  <!-- Color del tema de la barra de navegación -->
+  <meta name="theme-color" content="#ffde21">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom mb-3">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Calendario</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="tabla.html">Tabla</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <h3 class="text-center mb-4">Desglose de Extras</h3>
+
+  <!-- Filtro mes/año -->
+  <div class="d-flex justify-content-center gap-2 mb-3">
+    <select id="monthSelect" class="form-select w-auto"></select>
+    <select id="yearSelect" class="form-select w-auto"></select>
+  </div>
+
+  <table class="table table-striped table-bordered" id="budgetTable">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Evento</th>
+        <th>Desglose</th>
+        <th>Precio (€)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Se rellenará con JS -->
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="3" class="text-end">Total:</th>
+        <th id="totalPrice">0.00</th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<script>
+const events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
+const tbody = document.querySelector("#budgetTable tbody");
+const totalPriceEl = document.getElementById("totalPrice");
+const monthSelect = document.getElementById("monthSelect");
+const yearSelect = document.getElementById("yearSelect");
+
+const monthNames = [
+  "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+  "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+];
+
+// Inicializar selectores
+function initSelectors() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  monthNames.forEach((name, i) => {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = name;
+    if (i === currentMonth) opt.selected = true;
+    monthSelect.appendChild(opt);
+  });
+
+  for (let y = currentYear - 1; y <= currentYear + 2; y++) {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    if (y === currentYear) opt.selected = true;
+    yearSelect.appendChild(opt);
+  }
+}
+
+// Calcular clases extra
+function calcularClasesExtra(numClases) {
+  const rows = [];
+  if (numClases >= 1) rows.push({desc: "Clase 1", precio: 19});
+  for (let i = 2; i <= numClases; i++) {
+    rows.push({desc: `Clase ${i}`, precio: 15.71});
+  }
+  return rows;
+}
+
+// Renderizar tabla según mes/año
+function renderTable() {
+  tbody.innerHTML = "";
+  let totalPrice = 0;
+  const month = parseInt(monthSelect.value);
+  const year = parseInt(yearSelect.value);
+
+  // Filtrar eventos por mes/año
+  const filteredDates = Object.keys(events)
+    .filter(dateStr => {
+      const d = new Date(dateStr);
+      return d.getMonth() === month && d.getFullYear() === year;
+    })
+    .sort((a, b) => {
+      const eA = events[a];
+      const eB = events[b];
+      const order = {"extra": 1, "examen": 2, "call": 3};
+      return (order[eA.type || (eA.call ? "call" : "")] || 99) -
+             (order[eB.type || (eB.call ? "call" : "")] || 99);
+    });
+
+  filteredDates.forEach(date => {
+    const e = events[date];
+
+    // Clases extra
+    if (e.type === "extra") {
+      const clases = calcularClasesExtra(e.clases);
+      clases.forEach((c, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          ${i === 0 ? `<td rowspan="${clases.length}">${date}</td><td rowspan="${clases.length}">${e.clases} ext</td>` : ""}
+          <td>${c.desc}</td>
+          <td>${c.precio.toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+        totalPrice += c.precio;
+      });
+    }
+
+    // Examen
+    if (e.type === "examen") {
+      const tr = document.createElement("tr");
+      const precio = e.alumnos * 5;
+      tr.innerHTML = `
+        <td>${date}</td>
+        <td>Examen</td>
+        <td>${e.alumnos} alumno(s)</td>
+        <td>${precio.toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+      totalPrice += precio;
+    }
+
+    // Llamada post-examen
+    if (e.call) {
+      const tr = document.createElement("tr");
+      const precio = 20;
+      tr.innerHTML = `
+        <td>${date}</td>
+        <td>Llamada post-examen</td>
+        <td>1 llamada</td>
+        <td>${precio.toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+      totalPrice += precio;
+    }
+  });
+
+  totalPriceEl.textContent = totalPrice.toFixed(2);
+}
+
+// Inicialización
+initSelectors();
+renderTable();
+
+// Eventos cambio de mes/año
+monthSelect.addEventListener("change", renderTable);
+yearSelect.addEventListener("change", renderTable);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
