@@ -13,21 +13,32 @@
   min-height: 65px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background-color: #fff;
-  transition: background-color 0.2s;
-}
-
-.day.today {
-  background-color: #e3f2fd;
-  border: 1px solid #90caf9;
-}
-
-.day.has-task {
-  background-color: #e8f5e9;
-  border-color: #81c784;
+  justify-content: center;
+  transition: transform 0.1s;
+  border: 1px solid #ddd;
 }
 
 .day:hover {
-  background-color: #f1f1f1;
+  transform: scale(1.05);
+  background-color: #f8f9fa;
+}
+
+.day.today {
+  border: 2px solid #2196f3;
+}
+
+.day.day-green {
+  background-color: #c8e6c9 !important;
+  border-color: #66bb6a;
+}
+
+.day.day-red {
+  background-color: #ffcdd2 !important;
+  border-color: #e57373;
+}
+
+.legend .badge {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border-radius: 12px;
 }
