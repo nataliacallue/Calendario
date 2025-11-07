@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendario Personalizado</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 🔹 MANIFESTO PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+</head>
+
+<body>
+  <h1>📅 Mi Calendario</h1>
+
+  <div id="calendar"></div>
+
+  <form id="eventForm">
+    <h2>Agregar acción</h2>
+    <input type="date" id="eventDate" required>
+    <input type="text" id="eventText" placeholder="Descripción" required>
+    <button type="submit">Guardar</button>
+  </form>
+
+  <ul id="eventList"></ul>
+
+  <script src="script.js"></script>
+
+  <!-- 🔹 REGISTRAR SERVICE WORKER -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+      .then(() => console.log('Service Worker registrado ✅'))
+      .catch(err => console.error('Error al registrar el Service Worker:', err));
+    }
+  </script>
+</body>
+</html>
