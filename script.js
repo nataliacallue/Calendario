@@ -11,19 +11,18 @@ const examInputContainer = document.getElementById("examInputContainer");
 const examNumberInput = document.getElementById("examNumber");
 const saveExamNumberBtn = document.getElementById("saveExamNumber");
 const examInfo = document.getElementById("examInfo");
+const exportPDF = document.getElementById("exportPDF");
+const calendarTitle = document.getElementById("calendarTitle");
 
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
-
-// Mostramos de lunes a domingo
 const dayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 let events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
 let selectedDate = null;
 
-// Renderiza encabezado con nombres de días
 function renderWeekdays() {
   weekdaysDiv.innerHTML = "";
   dayNames.forEach(day => {
@@ -33,7 +32,6 @@ function renderWeekdays() {
   });
 }
 
-// Inicializa selects
 function initSelectors() {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -61,14 +59,13 @@ function renderCalendar() {
 
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
+  calendarTitle.textContent = `📅 Calendario Escolar — ${monthNames[month]} ${year}`;
+
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-
-  // Calculamos qué día empieza el mes (1 = lunes, 7 = domingo)
   let startDay = firstDay.getDay();
-  if (startDay === 0) startDay = 7; // domingo → 7
+  if (startDay === 0) startDay = 7;
 
-  // Espacios vacíos hasta el primer lunes
   for (let i = 1; i < startDay; i++) {
     const empty = document.createElement("div");
     calendar.appendChild(empty);
@@ -140,16 +137,51 @@ function updateExamInfo() {
     .filter(([_, e]) => e.type === "examen")
     .map(([date, e]) => {
       const [y, m, d] = date.split("-");
-      return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y} subieron ${e.alumnos} alumno${e.alumnos > 1 ? "s" : ""} a examen`;
+      return `<p>El ${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y} subieron ${e.alumnos} alumno${e.alumnos > 1 ? "s" : ""} a examen</p>`;
     });
 
-  examInfo.innerHTML = examDays.join("<br>") || "";
+  examInfo.innerHTML = examDays.join("") || "";
 }
+
+// Exportar a PDF
+exportPDF.addEventListener("click", async () => {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  const month = parseInt(monthSelect.value);
+  const year = parseInt(yearSelect.value);
+  let yPos = 20;
+
+  pdf.setFontSize(16);
+  pdf.text(`Calendario ${monthNames[month]} ${year}`, 10, yPos);
+  yPos += 10;
+
+  const exámenes = Object.entries(events)
+    .filter(([date, e]) => {
+      const [y, m] = date.split("-");
+      return parseInt(y) === year && parseInt(m) === month + 1 && e.type === "examen";
+    })
+    .map(([date, e]) => {
+      const [y, m, d] = date.split("-");
+      return `El ${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y} subieron ${e.alumnos} alumno${e.alumnos > 1 ? "s" : ""} a examen.`;
+    });
+
+  if (exámenes.length === 0) {
+    pdf.setFontSize(12);
+    pdf.text("No hay exámenes registrados este mes.", 10, yPos + 5);
+  } else {
+    pdf.setFontSize(12);
+    exámenes.forEach((line) => {
+      pdf.text(line, 10, yPos);
+      yPos += 8;
+    });
+  }
+
+  pdf.save(`Calendario_${monthNames[month]}_${year}.pdf`);
+});
 
 monthSelect.addEventListener("change", renderCalendar);
 yearSelect.addEventListener("change", renderCalendar);
 
-// Inicialización
 initSelectors();
 renderWeekdays();
 renderCalendar();
