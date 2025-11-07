@@ -1,4 +1,5 @@
 const calendar = document.getElementById("calendar");
+const weekdaysDiv = document.getElementById("weekdays");
 const monthSelect = document.getElementById("monthSelect");
 const yearSelect = document.getElementById("yearSelect");
 const modal = new bootstrap.Modal(document.getElementById("eventModal"));
@@ -16,8 +17,20 @@ const monthNames = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+const dayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
 let events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
 let selectedDate = null;
+
+// Renderiza nombres de días arriba
+function renderWeekdays() {
+  weekdaysDiv.innerHTML = "";
+  dayNames.forEach(day => {
+    const div = document.createElement("div");
+    div.textContent = day;
+    weekdaysDiv.appendChild(div);
+  });
+}
 
 // Inicializa selects de mes y año
 function initSelectors() {
@@ -50,7 +63,12 @@ function renderCalendar() {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
 
-  for (let i = 0; i < firstDay.getDay(); i++) {
+  // Ajustar inicio: el domingo debe ir al final
+  let startDay = firstDay.getDay();
+  if (startDay === 0) startDay = 7;
+
+  // Espacios vacíos antes del primer día
+  for (let i = 1; i < startDay; i++) {
     const empty = document.createElement("div");
     calendar.appendChild(empty);
   }
@@ -131,8 +149,7 @@ monthSelect.addEventListener("change", renderCalendar);
 yearSelect.addEventListener("change", renderCalendar);
 
 initSelectors();
+renderWeekdays();
 renderCalendar();
 
-
-renderCalendar();
 
