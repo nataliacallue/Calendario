@@ -1,38 +1,27 @@
-body {
-  font-family: system-ui, sans-serif;
-  padding: 1rem;
-  background: #f5f5f5;
-  color: #333;
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  font-size: 0.9rem;
 }
 
-h1 {
+.day {
+  border-radius: 8px;
   text-align: center;
-}
-
-#eventForm {
+  padding: 8px;
+  cursor: pointer;
+  min-height: 65px;
   display: flex;
   flex-direction: column;
-  gap: .5rem;
-  margin-top: 1rem;
+  justify-content: space-between;
 }
 
-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: .5rem;
-  border-radius: 5px;
+.day.today {
+  background-color: #e3f2fd;
+  border: 1px solid #90caf9;
 }
 
-#eventList {
-  list-style: none;
-  padding: 0;
-  margin-top: 1rem;
-}
-
-#eventList li {
-  background: white;
-  margin-bottom: .5rem;
-  padding: .5rem;
-  border-radius: 5px;
+.day .tasks {
+  font-size: 0.75rem;
+  color: #555;
 }
