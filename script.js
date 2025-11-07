@@ -1,5 +1,6 @@
 const calendar = document.getElementById("calendar");
-const monthTitle = document.getElementById("monthTitle");
+const monthSelect = document.getElementById("monthSelect");
+const yearSelect = document.getElementById("yearSelect");
 const modal = new bootstrap.Modal(document.getElementById("eventModal"));
 const selectedDateText = document.getElementById("selectedDateText");
 const setDayBtn = document.getElementById("setDay");
@@ -18,13 +19,33 @@ const monthNames = [
 let events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
 let selectedDate = null;
 
+// Inicializa selects de mes y año
+function initSelectors() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  monthNames.forEach((name, i) => {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = name;
+    if (i === currentMonth) opt.selected = true;
+    monthSelect.appendChild(opt);
+  });
+
+  for (let y = currentYear - 1; y <= currentYear + 2; y++) {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    if (y === currentYear) opt.selected = true;
+    yearSelect.appendChild(opt);
+  }
+}
+
 function renderCalendar() {
   calendar.innerHTML = "";
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-
-  monthTitle.innerText = `${monthNames[month]} ${year}`;
+  const month = parseInt(monthSelect.value);
+  const year = parseInt(yearSelect.value);
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
@@ -40,16 +61,14 @@ function renderCalendar() {
     div.className = "day";
     div.innerHTML = `<div class="fw-bold">${day}</div>`;
 
-    if (date === `${year}-${month + 1}-${now.getDate()}`) {
+    const today = new Date();
+    if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
       div.classList.add("today");
     }
 
     const event = events[date];
-    if (event?.type === "dia") {
-      div.classList.add("day-green");
-    } else if (event?.type === "examen") {
-      div.classList.add("day-red");
-    }
+    if (event?.type === "dia") div.classList.add("day-green");
+    else if (event?.type === "examen") div.classList.add("day-red");
 
     div.addEventListener("click", () => {
       selectedDate = date;
@@ -102,10 +121,18 @@ function updateExamInfo() {
     .filter(([_, e]) => e.type === "examen")
     .map(([date, e]) => {
       const [y, m, d] = date.split("-");
-      return `El día ${d} de ${monthNames[m - 1]} de ${y} subieron a examen ${e.alumnos} alumno${e.alumnos > 1 ? "s" : ""}`;
+      return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y} subieron ${e.alumnos} alumno${e.alumnos > 1 ? "s" : ""} a examen`;
     });
 
   examInfo.innerHTML = examDays.join("<br>") || "";
 }
 
+monthSelect.addEventListener("change", renderCalendar);
+yearSelect.addEventListener("change", renderCalendar);
+
+initSelectors();
 renderCalendar();
+
+
+renderCalendar();
+
