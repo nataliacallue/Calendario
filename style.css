@@ -2,6 +2,14 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.weekdays div {
+  padding: 6px 0;
+  background-color: #f1f3f4;
+  border-radius: 4px;
 }
 
 .calendar {
@@ -48,5 +56,3 @@
   padding: 6px 12px;
   border-radius: 12px;
 }
-
-
