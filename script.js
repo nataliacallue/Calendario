@@ -17,12 +17,13 @@ const monthNames = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+// Mostramos de lunes a domingo
 const dayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 let events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
 let selectedDate = null;
 
-// Renderiza nombres de días arriba
+// Renderiza encabezado con nombres de días
 function renderWeekdays() {
   weekdaysDiv.innerHTML = "";
   dayNames.forEach(day => {
@@ -32,7 +33,7 @@ function renderWeekdays() {
   });
 }
 
-// Inicializa selects de mes y año
+// Inicializa selects
 function initSelectors() {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -57,17 +58,17 @@ function initSelectors() {
 
 function renderCalendar() {
   calendar.innerHTML = "";
+
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
-
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
 
-  // Ajustar inicio: el domingo debe ir al final
+  // Calculamos qué día empieza el mes (1 = lunes, 7 = domingo)
   let startDay = firstDay.getDay();
-  if (startDay === 0) startDay = 7;
+  if (startDay === 0) startDay = 7; // domingo → 7
 
-  // Espacios vacíos antes del primer día
+  // Espacios vacíos hasta el primer lunes
   for (let i = 1; i < startDay; i++) {
     const empty = document.createElement("div");
     calendar.appendChild(empty);
@@ -148,8 +149,11 @@ function updateExamInfo() {
 monthSelect.addEventListener("change", renderCalendar);
 yearSelect.addEventListener("change", renderCalendar);
 
+// Inicialización
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
+
 
 
