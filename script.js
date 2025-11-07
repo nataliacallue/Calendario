@@ -104,13 +104,13 @@ function renderCalendar() {
 
     // Texto dentro de la casilla
     if (event?.type === "examen") {
-      div.innerHTML += `<div>Examen</div>`;
+      div.innerHTML += `<div></div>`;
       const infoP = document.createElement("p");
       infoP.textContent = `El ${day.toString().padStart(2,"0")}/${(month+1).toString().padStart(2,"0")}/${year} subieron ${event.alumnos} alumnos a examen.`;
       infoP.style.color = "black";
       examInfo.appendChild(infoP);
     } else if (event?.type === "extra") {
-      div.innerHTML += `<div>${event.clases} clase(s) extra</div>`;
+      div.innerHTML += `<div>${event.clases} ext</div>`;
     }
 
     // Evento click para modal
@@ -238,5 +238,6 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
 
 
