@@ -14,6 +14,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  background-color: #fff;
+  transition: background-color 0.2s;
 }
 
 .day.today {
@@ -21,7 +23,11 @@
   border: 1px solid #90caf9;
 }
 
-.day .tasks {
-  font-size: 0.75rem;
-  color: #555;
+.day.has-task {
+  background-color: #e8f5e9;
+  border-color: #81c784;
+}
+
+.day:hover {
+  background-color: #f1f1f1;
 }
