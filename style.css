@@ -51,8 +51,10 @@
   border-color: #e57373;
 }
 
-.legend .badge {
-  font-size: 1rem;
-  padding: 6px 12px;
-  border-radius: 12px;
+/* Frases de exámenes subrayadas en rojo */
+#examInfo p {
+  text-decoration: underline;
+  text-decoration-color: red;
+  margin-bottom: 4px;
 }
+
