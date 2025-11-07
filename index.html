@@ -13,16 +13,20 @@
   <div class="container py-3">
     <h2 class="text-center mb-1 fw-bold">📅 Calendario Escolar</h2>
     <h4 id="monthTitle" class="text-center mb-3 text-primary"></h4>
+
     <div id="calendar" class="calendar border rounded shadow-sm p-2 bg-white"></div>
 
     <!-- Leyenda -->
-    <div class="legend mt-3 text-center">
-      <span class="badge bg-success me-2">Días</span>
+    <div class="legend mt-4 text-center d-flex flex-column align-items-center">
+      <span class="badge bg-success mb-2">Días</span>
       <span class="badge bg-danger">Examen</span>
     </div>
+
+    <!-- Mensajes dinámicos -->
+    <div id="examInfo" class="mt-3 text-center text-secondary small"></div>
   </div>
 
-  <!-- Modal para seleccionar tipo -->
+  <!-- Modal -->
   <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -32,8 +36,16 @@
         </div>
         <div class="modal-body text-center">
           <p id="selectedDateText" class="mb-3 fw-semibold"></p>
+
           <button class="btn btn-success me-2" id="setDay">Día</button>
           <button class="btn btn-danger" id="setExam">Examen</button>
+
+          <!-- Campo oculto que aparece al marcar Examen -->
+          <div id="examInputContainer" class="mt-3" style="display:none;">
+            <label for="examNumber" class="form-label">¿Cuántos subieron a examen?</label>
+            <input type="number" min="1" id="examNumber" class="form-control w-50 mx-auto" placeholder="Ej: 5">
+            <button class="btn btn-primary mt-2" id="saveExamNumber">Guardar examen</button>
+          </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -47,4 +59,6 @@
   <script src="script.js"></script>
 </body>
 </html>
+
+
 
