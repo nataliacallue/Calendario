@@ -11,9 +11,6 @@ const examInputContainer = document.getElementById("examInputContainer");
 const examNumberInput = document.getElementById("examNumber");
 const saveExamNumberBtn = document.getElementById("saveExamNumber");
 const examInfo = document.getElementById("examInfo");
-const exportPDF = document.getElementById("exportPDF");
-const calendarTitle = document.getElementById("calendarTitle");
-const calendarContainer = document.getElementById("calendarContainer");
 
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -24,15 +21,18 @@ const dayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 let events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
 let selectedDate = null;
 
+// === Días de la semana ===
 function renderWeekdays() {
   weekdaysDiv.innerHTML = "";
   dayNames.forEach(day => {
     const div = document.createElement("div");
     div.textContent = day;
+    div.classList.add("text-center", "fw-bold");
     weekdaysDiv.appendChild(div);
   });
 }
 
+// === Inicializar selectores ===
 function initSelectors() {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -55,12 +55,11 @@ function initSelectors() {
   }
 }
 
+// === Generar calendario ===
 function renderCalendar() {
   calendar.innerHTML = "";
-
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
-  calendarTitle.textContent = `📅 Calendario Escolar — ${monthNames[month]} ${year}`;
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
@@ -78,14 +77,17 @@ function renderCalendar() {
     div.className = "day";
     div.innerHTML = `<div class="fw-bold">${day}</div>`;
 
-    const today = new Date();
-    if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-      div.classList.add("today");
-    }
-
     const event = events[date];
     if (event?.type === "dia") div.classList.add("day-green");
     else if (event?.type === "examen") div.classList.add("day-red");
+
+    if (event?.type === "examen") {
+      const text = document.createElement("small");
+      text.textContent = `Subieron ${event.alumnos}`;
+      text.style.textDecoration = "underline";
+      text.style.color = "red";
+      div.appendChild(text);
+    }
 
     div.addEventListener("click", () => {
       selectedDate = date;
@@ -97,10 +99,9 @@ function renderCalendar() {
 
     calendar.appendChild(div);
   }
-
-  updateExamInfo();
 }
 
+// === Acciones del modal ===
 setDayBtn.addEventListener("click", () => {
   if (selectedDate) {
     events[selectedDate] = { type: "dia" };
@@ -133,64 +134,58 @@ clearDayBtn.addEventListener("click", () => {
   }
 });
 
-function updateExamInfo() {
-  const examDays = Object.entries(events)
-    .filter(([_, e]) => e.type === "examen")
-    .map(([date, e]) => {
-      const [y, m, d] = date.split("-");
-      return `<p>El ${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y} subieron ${e.alumnos} alumno${e.alumnos > 1 ? "s" : ""} a examen</p>`;
-    });
-
-  examInfo.innerHTML = examDays.join("") || "";
-}
-
-// 📤 Exportar PDF limpio
-exportPDF.addEventListener("click", async () => {
+// === Exportar PDF limpio (sin botones ni selectores) ===
+document.getElementById("exportPDF").addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF("p", "mm", "a4");
+  const pdf = new jsPDF("landscape", "mm", "a4");
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
 
-  // Ocultar elementos no deseados
+  // Ocultar selectores, botón y leyenda
   const controls = document.querySelector(".d-flex");
-  exportPDF.style.display = "none";
+  const exportBtn = document.getElementById("exportPDF");
 
   if (controls) controls.style.display = "none";
+  if (exportBtn) exportBtn.style.display = "none";
 
-  // Espera un pequeño momento para que se actualice la vista
-  await new Promise(r => setTimeout(r, 200));
+  await new Promise(r => setTimeout(r, 250));
 
-  const canvas = await html2canvas(calendarContainer, { scale: 2 });
+  const container = document.querySelector(".container");
+
+  // Forzar altura completa del contenedor (para móvil)
+  container.style.height = "auto";
+  container.style.overflow = "visible";
+
+  const canvas = await html2canvas(container, { 
+    scale: 2, 
+    useCORS: true, 
+    scrollY: -window.scrollY,
+    windowWidth: document.documentElement.offsetWidth,
+    windowHeight: document.documentElement.scrollHeight 
+  });
+
   const imgData = canvas.toDataURL("image/png");
-
   const pageWidth = pdf.internal.pageSize.getWidth();
   const imgWidth = pageWidth - 20;
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-  pdf.text(`Calendario ${monthNames[month]} ${year}`, 10, 10);
+  pdf.text(`Calendario — ${monthNames[month]} ${year}`, 10, 10);
   pdf.addImage(imgData, "PNG", 10, 20, imgWidth, imgHeight);
-
-  let yPos = imgHeight + 30;
-  const examTexts = examInfo.innerText.split("\n").filter(Boolean);
-  pdf.setFontSize(12);
-  examTexts.forEach(text => {
-    pdf.text(text, 10, yPos);
-    yPos += 7;
-  });
-
   pdf.save(`Calendario_${monthNames[month]}_${year}.pdf`);
 
   // Restaurar visibilidad
   if (controls) controls.style.display = "flex";
-  exportPDF.style.display = "inline-block";
+  if (exportBtn) exportBtn.style.display = "inline-block";
 });
 
+// === Inicializar ===
 monthSelect.addEventListener("change", renderCalendar);
 yearSelect.addEventListener("change", renderCalendar);
-
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
+
 
 
 
