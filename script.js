@@ -1,52 +1,57 @@
 const calendar = document.getElementById("calendar");
 const monthTitle = document.getElementById("monthTitle");
-const modal = new bootstrap.Modal(document.getElementById("taskModal"));
-const taskDateInput = document.getElementById("taskDate");
-const taskTextInput = document.getElementById("taskText");
-const saveTaskBtn = document.getElementById("saveTaskBtn");
+const modal = new bootstrap.Modal(document.getElementById("eventModal"));
+const selectedDateText = document.getElementById("selectedDateText");
+const setDayBtn = document.getElementById("setDay");
+const setExamBtn = document.getElementById("setExam");
+const clearDayBtn = document.getElementById("clearDay");
 
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
-let tasks = JSON.parse(localStorage.getItem("tasks")) || {};
+let events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
+let selectedDate = null;
 
 function renderCalendar() {
-  calendar.innerHTML = ""; // limpia los días
+  calendar.innerHTML = "";
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
 
-  monthTitle.innerText = `${monthNames[month]} ${year}`; // actualiza el título
+  monthTitle.innerText = `${monthNames[month]} ${year}`;
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
 
-  // Espacios vacíos antes del primer día
+  // Días vacíos al inicio
   for (let i = 0; i < firstDay.getDay(); i++) {
     const empty = document.createElement("div");
     calendar.appendChild(empty);
   }
 
+  // Crear días del mes
   for (let day = 1; day <= lastDay.getDate(); day++) {
     const date = `${year}-${month + 1}-${day}`;
     const div = document.createElement("div");
-    div.className = "day border";
+    div.className = "day";
+    div.innerHTML = `<div class="fw-bold">${day}</div>`;
 
-    const dayTasks = tasks[date] || [];
+    // Marca visual
+    if (date === `${year}-${month + 1}-${now.getDate()}`) {
+      div.classList.add("today");
+    }
 
-    div.innerHTML = `
-      <div class="fw-bold">${day}</div>
-      <div class="tasks text-muted small">${dayTasks.join(", ")}</div>
-    `;
-
-    if (day === now.getDate()) div.classList.add("today");
-    if (dayTasks.length > 0) div.classList.add("has-task");
+    if (events[date] === "dia") {
+      div.classList.add("day-green");
+    } else if (events[date] === "examen") {
+      div.classList.add("day-red");
+    }
 
     div.addEventListener("click", () => {
-      taskDateInput.value = date;
-      taskTextInput.value = "";
+      selectedDate = date;
+      selectedDateText.textContent = `Día ${day} de ${monthNames[month]}`;
       modal.show();
     });
 
@@ -54,21 +59,32 @@ function renderCalendar() {
   }
 }
 
-saveTaskBtn.addEventListener("click", () => {
-  const date = taskDateInput.value;
-  const text = taskTextInput.value.trim();
-  if (!text) return;
+setDayBtn.addEventListener("click", () => {
+  if (selectedDate) {
+    events[selectedDate] = "dia";
+    localStorage.setItem("calendarEvents", JSON.stringify(events));
+    modal.hide();
+    renderCalendar();
+  }
+});
 
-  if (!tasks[date]) tasks[date] = [];
-  tasks[date].push(text);
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  modal.hide();
-  renderCalendar();
+setExamBtn.addEventListener("click", () => {
+  if (selectedDate) {
+    events[selectedDate] = "examen";
+    localStorage.setItem("calendarEvents", JSON.stringify(events));
+    modal.hide();
+    renderCalendar();
+  }
+});
+
+clearDayBtn.addEventListener("click", () => {
+  if (selectedDate) {
+    delete events[selectedDate];
+    localStorage.setItem("calendarEvents", JSON.stringify(events));
+    modal.hide();
+    renderCalendar();
+  }
 });
 
 renderCalendar();
-
-
-renderCalendar();
-
 
