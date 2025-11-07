@@ -13,6 +13,7 @@ const saveExamNumberBtn = document.getElementById("saveExamNumber");
 const examInfo = document.getElementById("examInfo");
 const exportPDF = document.getElementById("exportPDF");
 const calendarTitle = document.getElementById("calendarTitle");
+const calendarContainer = document.getElementById("calendarContainer");
 
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -143,38 +144,30 @@ function updateExamInfo() {
   examInfo.innerHTML = examDays.join("") || "";
 }
 
-// Exportar a PDF
+// 📤 Exportar PDF con html2canvas
 exportPDF.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
+  const pdf = new jsPDF("p", "mm", "a4");
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
-  let yPos = 20;
 
-  pdf.setFontSize(16);
-  pdf.text(`Calendario ${monthNames[month]} ${year}`, 10, yPos);
-  yPos += 10;
+  const canvas = await html2canvas(calendarContainer, { scale: 2 });
+  const imgData = canvas.toDataURL("image/png");
 
-  const exámenes = Object.entries(events)
-    .filter(([date, e]) => {
-      const [y, m] = date.split("-");
-      return parseInt(y) === year && parseInt(m) === month + 1 && e.type === "examen";
-    })
-    .map(([date, e]) => {
-      const [y, m, d] = date.split("-");
-      return `El ${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y} subieron ${e.alumnos} alumno${e.alumnos > 1 ? "s" : ""} a examen.`;
-    });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const imgWidth = pageWidth - 20;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-  if (exámenes.length === 0) {
-    pdf.setFontSize(12);
-    pdf.text("No hay exámenes registrados este mes.", 10, yPos + 5);
-  } else {
-    pdf.setFontSize(12);
-    exámenes.forEach((line) => {
-      pdf.text(line, 10, yPos);
-      yPos += 8;
-    });
-  }
+  pdf.text(`Calendario ${monthNames[month]} ${year}`, 10, 10);
+  pdf.addImage(imgData, "PNG", 10, 20, imgWidth, imgHeight);
+
+  let yPos = imgHeight + 30;
+  const examTexts = examInfo.innerText.split("\n").filter(Boolean);
+  pdf.setFontSize(12);
+  examTexts.forEach(text => {
+    pdf.text(text, 10, yPos);
+    yPos += 7;
+  });
 
   pdf.save(`Calendario_${monthNames[month]}_${year}.pdf`);
 });
