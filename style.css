@@ -38,7 +38,11 @@
 }
 
 .legend .badge {
-  font-size: 0.9rem;
+  font-size: 1rem;
   padding: 6px 12px;
   border-radius: 12px;
+}
+
+#examInfo {
+  font-style: italic;
 }
