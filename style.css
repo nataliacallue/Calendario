@@ -1,3 +1,9 @@
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 0.85rem;
+}
+
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -42,3 +48,5 @@
   padding: 6px 12px;
   border-radius: 12px;
 }
+
+
