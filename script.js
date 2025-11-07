@@ -1,36 +1,69 @@
-const form = document.getElementById('eventForm');
-const list = document.getElementById('eventList');
+const calendar = document.getElementById("calendar");
+const modal = new bootstrap.Modal(document.getElementById("taskModal"));
+const taskDateInput = document.getElementById("taskDate");
+const taskTextInput = document.getElementById("taskText");
+const saveTaskBtn = document.getElementById("saveTaskBtn");
 
-let events = JSON.parse(localStorage.getItem('events')) || [];
+const monthNames = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
 
-function renderEvents() {
-  list.innerHTML = '';
-  events.forEach((ev, index) => {
-    const li = document.createElement('li');
-    li.textContent = `${ev.date}: ${ev.text}`;
-    const delBtn = document.createElement('button');
-    delBtn.textContent = '❌';
-    delBtn.onclick = () => {
-      events.splice(index, 1);
-      saveEvents();
-    };
-    li.appendChild(delBtn);
-    list.appendChild(li);
-  });
+let tasks = JSON.parse(localStorage.getItem("tasks")) || {};
+
+function renderCalendar() {
+  calendar.innerHTML = "";
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  // Mostrar nombre del mes arriba
+  const monthTitle = document.createElement("h4");
+  monthTitle.className = "text-center my-2";
+  monthTitle.innerText = `${monthNames[month]} ${year}`;
+  calendar.before(monthTitle);
+
+  // Crear los días vacíos antes del 1
+  for (let i = 0; i < firstDay.getDay(); i++) {
+    const empty = document.createElement("div");
+    calendar.appendChild(empty);
+  }
+
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const date = `${year}-${month + 1}-${day}`;
+    const div = document.createElement("div");
+    div.className = "day border";
+    div.innerHTML = `
+      <div class="fw-bold">${day}</div>
+      <div class="tasks">${tasks[date] ? tasks[date].join(", ") : ""}</div>
+    `;
+
+    if (day === now.getDate()) div.classList.add("today");
+
+    div.addEventListener("click", () => {
+      taskDateInput.value = date;
+      taskTextInput.value = "";
+      modal.show();
+    });
+
+    calendar.appendChild(div);
+  }
 }
 
-function saveEvents() {
-  localStorage.setItem('events', JSON.stringify(events));
-  renderEvents();
-}
+saveTaskBtn.addEventListener("click", () => {
+  const date = taskDateInput.value;
+  const text = taskTextInput.value.trim();
+  if (!text) return;
+  
+  if (!tasks[date]) tasks[date] = [];
+  tasks[date].push(text);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  modal.hide();
+  renderCalendar();
+});
 
-form.onsubmit = (e) => {
-  e.preventDefault();
-  const date = document.getElementById('eventDate').value;
-  const text = document.getElementById('eventText').value;
-  events.push({ date, text });
-  saveEvents();
-  form.reset();
-};
+renderCalendar();
 
-renderEvents();
