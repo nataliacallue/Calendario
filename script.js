@@ -1,4 +1,5 @@
 const calendar = document.getElementById("calendar");
+const monthTitle = document.getElementById("monthTitle");
 const modal = new bootstrap.Modal(document.getElementById("taskModal"));
 const taskDateInput = document.getElementById("taskDate");
 const taskTextInput = document.getElementById("taskText");
@@ -12,21 +13,17 @@ const monthNames = [
 let tasks = JSON.parse(localStorage.getItem("tasks")) || {};
 
 function renderCalendar() {
-  calendar.innerHTML = "";
+  calendar.innerHTML = ""; // limpia los días
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
 
+  monthTitle.innerText = `${monthNames[month]} ${year}`; // actualiza el título
+
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
 
-  // Mostrar nombre del mes arriba
-  const monthTitle = document.createElement("h4");
-  monthTitle.className = "text-center my-2";
-  monthTitle.innerText = `${monthNames[month]} ${year}`;
-  calendar.before(monthTitle);
-
-  // Crear los días vacíos antes del 1
+  // Espacios vacíos antes del primer día
   for (let i = 0; i < firstDay.getDay(); i++) {
     const empty = document.createElement("div");
     calendar.appendChild(empty);
@@ -36,12 +33,16 @@ function renderCalendar() {
     const date = `${year}-${month + 1}-${day}`;
     const div = document.createElement("div");
     div.className = "day border";
+
+    const dayTasks = tasks[date] || [];
+
     div.innerHTML = `
       <div class="fw-bold">${day}</div>
-      <div class="tasks">${tasks[date] ? tasks[date].join(", ") : ""}</div>
+      <div class="tasks text-muted small">${dayTasks.join(", ")}</div>
     `;
 
     if (day === now.getDate()) div.classList.add("today");
+    if (dayTasks.length > 0) div.classList.add("has-task");
 
     div.addEventListener("click", () => {
       taskDateInput.value = date;
@@ -57,7 +58,7 @@ saveTaskBtn.addEventListener("click", () => {
   const date = taskDateInput.value;
   const text = taskTextInput.value.trim();
   if (!text) return;
-  
+
   if (!tasks[date]) tasks[date] = [];
   tasks[date].push(text);
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -66,4 +67,8 @@ saveTaskBtn.addEventListener("click", () => {
 });
 
 renderCalendar();
+
+
+renderCalendar();
+
 
