@@ -5,6 +5,10 @@ const selectedDateText = document.getElementById("selectedDateText");
 const setDayBtn = document.getElementById("setDay");
 const setExamBtn = document.getElementById("setExam");
 const clearDayBtn = document.getElementById("clearDay");
+const examInputContainer = document.getElementById("examInputContainer");
+const examNumberInput = document.getElementById("examNumber");
+const saveExamNumberBtn = document.getElementById("saveExamNumber");
+const examInfo = document.getElementById("examInfo");
 
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -25,43 +29,45 @@ function renderCalendar() {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
 
-  // Días vacíos al inicio
   for (let i = 0; i < firstDay.getDay(); i++) {
     const empty = document.createElement("div");
     calendar.appendChild(empty);
   }
 
-  // Crear días del mes
   for (let day = 1; day <= lastDay.getDate(); day++) {
     const date = `${year}-${month + 1}-${day}`;
     const div = document.createElement("div");
     div.className = "day";
     div.innerHTML = `<div class="fw-bold">${day}</div>`;
 
-    // Marca visual
     if (date === `${year}-${month + 1}-${now.getDate()}`) {
       div.classList.add("today");
     }
 
-    if (events[date] === "dia") {
+    const event = events[date];
+    if (event?.type === "dia") {
       div.classList.add("day-green");
-    } else if (events[date] === "examen") {
+    } else if (event?.type === "examen") {
       div.classList.add("day-red");
     }
 
     div.addEventListener("click", () => {
       selectedDate = date;
-      selectedDateText.textContent = `Día ${day} de ${monthNames[month]}`;
+      selectedDateText.textContent = `Día ${day} de ${monthNames[month]} de ${year}`;
+      examInputContainer.style.display = "none";
+      examNumberInput.value = "";
       modal.show();
     });
 
     calendar.appendChild(div);
   }
+
+  updateExamInfo();
 }
 
 setDayBtn.addEventListener("click", () => {
   if (selectedDate) {
-    events[selectedDate] = "dia";
+    events[selectedDate] = { type: "dia" };
     localStorage.setItem("calendarEvents", JSON.stringify(events));
     modal.hide();
     renderCalendar();
@@ -69,8 +75,13 @@ setDayBtn.addEventListener("click", () => {
 });
 
 setExamBtn.addEventListener("click", () => {
-  if (selectedDate) {
-    events[selectedDate] = "examen";
+  examInputContainer.style.display = "block";
+});
+
+saveExamNumberBtn.addEventListener("click", () => {
+  const num = parseInt(examNumberInput.value);
+  if (selectedDate && num > 0) {
+    events[selectedDate] = { type: "examen", alumnos: num };
     localStorage.setItem("calendarEvents", JSON.stringify(events));
     modal.hide();
     renderCalendar();
@@ -86,5 +97,15 @@ clearDayBtn.addEventListener("click", () => {
   }
 });
 
-renderCalendar();
+function updateExamInfo() {
+  const examDays = Object.entries(events)
+    .filter(([_, e]) => e.type === "examen")
+    .map(([date, e]) => {
+      const [y, m, d] = date.split("-");
+      return `El día ${d} de ${monthNames[m - 1]} de ${y} subieron a examen ${e.alumnos} alumno${e.alumnos > 1 ? "s" : ""}`;
+    });
 
+  examInfo.innerHTML = examDays.join("<br>") || "";
+}
+
+renderCalendar();
