@@ -144,12 +144,21 @@ function updateExamInfo() {
   examInfo.innerHTML = examDays.join("") || "";
 }
 
-// 📤 Exportar PDF con html2canvas
+// 📤 Exportar PDF limpio
 exportPDF.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "mm", "a4");
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
+
+  // Ocultar elementos no deseados
+  const controls = document.querySelector(".d-flex");
+  exportPDF.style.display = "none";
+
+  if (controls) controls.style.display = "none";
+
+  // Espera un pequeño momento para que se actualice la vista
+  await new Promise(r => setTimeout(r, 200));
 
   const canvas = await html2canvas(calendarContainer, { scale: 2 });
   const imgData = canvas.toDataURL("image/png");
@@ -170,6 +179,10 @@ exportPDF.addEventListener("click", async () => {
   });
 
   pdf.save(`Calendario_${monthNames[month]}_${year}.pdf`);
+
+  // Restaurar visibilidad
+  if (controls) controls.style.display = "flex";
+  exportPDF.style.display = "inline-block";
 });
 
 monthSelect.addEventListener("change", renderCalendar);
@@ -178,6 +191,8 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
+
 
 
 
