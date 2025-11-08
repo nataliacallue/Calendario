@@ -1,4 +1,4 @@
- // ======== Selección de elementos ========
+// ======== Selección de elementos ========
 const calendar = document.getElementById("calendar");
 const weekdaysDiv = document.getElementById("weekdays");
 const monthSelect = document.getElementById("monthSelect");
@@ -104,16 +104,14 @@ function renderCalendar() {
 
     // Texto dentro de la casilla
     if (event?.type === "examen") {
-    div.innerHTML += `<div>${event.alumnos} Al.s</div>`; // Muestra número de alumnos
-    // Información debajo en la leyenda
-    const infoP = document.createElement("p");
-    infoP.textContent = `El ${day.toString().padStart(2,"0")}/${(month+1).toString().padStart(2,"0")}/${year} subieron ${event.alumnos} alumnos a examen.`;
-    infoP.style.color = "black";
-    examInfo.appendChild(infoP);
+      div.innerHTML += `<div></div>`;
+      const infoP = document.createElement("p");
+      infoP.textContent = `El ${day.toString().padStart(2,"0")}/${(month+1).toString().padStart(2,"0")}/${year} subieron ${event.alumnos} alumnos a examen.`;
+      infoP.style.color = "black";
+      examInfo.appendChild(infoP);
     } else if (event?.type === "extra") {
-    div.innerHTML += `<div>${event.clases} ext</div>`;
+      div.innerHTML += `<div>${event.clases} ext</div>`;
     }
-
 
     // Evento click para modal
     div.addEventListener("click", () => {
@@ -198,7 +196,7 @@ clearDayBtn.addEventListener("click", () => {
 // Exportar PDF
 document.getElementById("exportPDF").addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF("landscape", "mm", "a4");
+  const pdf = new jsPDF("portrait", "mm", "a4");
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
 
@@ -240,7 +238,3 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
-
-
-
-
