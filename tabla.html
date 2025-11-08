@@ -45,7 +45,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom mb-3">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="#"></a>
+    <a class="navbar-brand fw-bold" href="#">Mi Calendario</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -115,18 +115,6 @@ const monthNames = [
   "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
 ];
 
-// 🟢 CORRECCIÓN: cuando guardes eventos en el calendario, usa este formato:
-function guardarEvento(fecha, datosEvento) {
-  const y = fecha.getFullYear();
-  const m = String(fecha.getMonth() + 1).padStart(2, "0");
-  const d = String(fecha.getDate()).padStart(2, "0");
-  const dateKey = `${y}-${m}-${d}`; // formato seguro YYYY-MM-DD
-
-  const events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
-  events[dateKey] = datosEvento;
-  localStorage.setItem("calendarEvents", JSON.stringify(events));
-}
-
 // Inicializar selectores
 function initSelectors() {
   const now = new Date();
@@ -150,10 +138,22 @@ function initSelectors() {
   }
 }
 
+// Función de compatibilidad de fechas para Safari
+function safeDate(dateStr) {
+  if (!dateStr) return null;
+  if (dateStr instanceof Date) return dateStr.toISOString();
+  if (dateStr.includes("T")) return dateStr;
+
+  const parts = dateStr.split("-");
+  if (parts.length < 3) return null;
+  const [y, m, d] = parts.map((p, i) => i === 0 ? p : p.padStart(2, "0"));
+  return `${y}-${m}-${d}T00:00:00`;
+}
+
 // Calcular clases extra
 function calcularClasesExtra(numClases, fechaStr) {
   const rows = [];
-  const fecha = new Date(fechaStr);
+  const fecha = new Date(safeDate(fechaStr));
   const esSabado = fecha.getDay() === 6;
 
   if (esSabado) {
@@ -173,22 +173,16 @@ function renderTable() {
   const year = parseInt(yearSelect.value);
 
   const sortedEvents = Object.entries(events)
-    .map(([date, e]) => ({ date, ...e }))
+    .map(([date, e]) => ({ date: safeDate(date), ...e }))
     .filter(e => {
-      const d = new Date(e.date);
-      return d.getMonth() === month && d.getFullYear() === year;
+      const d = new Date(safeDate(e.date));
+      return d instanceof Date && !isNaN(d) && d.getMonth() === month && d.getFullYear() === year;
     })
-    .sort((a, b) => {
-      const order = { "extra": 1, "examen": 2, "call": 3 };
-      if (a.date === b.date)
-        return (order[a.type || (a.call ? "call" : "")] || 99) -
-               (order[b.type || (b.call ? "call" : "")] || 99);
-      return new Date(a.date) - new Date(b.date);
-    });
+    .sort((a, b) => new Date(safeDate(a.date)) - new Date(safeDate(b.date)));
 
   sortedEvents.forEach(e => {
-    const fechaObj = new Date(e.date);
-    const fechaStr = `${fechaObj.getDate().toString().padStart(2, "0")}/${(fechaObj.getMonth() + 1).toString().padStart(2, "0")}/${fechaObj.getFullYear()}`;
+    const fechaObj = new Date(safeDate(e.date));
+    const fechaStr = `${fechaObj.getDate().toString().padStart(2,"0")}/${(fechaObj.getMonth()+1).toString().padStart(2,"0")}/${fechaObj.getFullYear()}`;
 
     if (e.type === "extra") {
       const { rows: clases, esSabado } = calcularClasesExtra(e.clases, e.date);
