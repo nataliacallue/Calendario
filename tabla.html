@@ -1,87 +1,46 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tabla de Presupuesto</title>
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Iconos para iOS -->
-  <link rel="apple-touch-icon" href="icon-192.png">
-
-  <!-- Habilitar modo pantalla completa en iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="MiCalendario">
-
-  <!-- Color del tema de la barra de navegación -->
-  <meta name="theme-color" content="#ffde21">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom mb-3">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#"></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="index.html">Calendario</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="tabla.html">Tabla</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<div class="container py-4">
-  <h3 class="text-center mb-4">Desglose de Extras</h3>
-
-  <!-- Filtro mes/año -->
-  <div class="d-flex justify-content-center gap-2 mb-3">
-    <select id="monthSelect" class="form-select w-auto"></select>
-    <select id="yearSelect" class="form-select w-auto"></select>
-  </div>
-
-  <table class="table table-striped table-bordered" id="budgetTable">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Evento</th>
-        <th>Desglose</th>
-        <th>Precio (€)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr>
-        <th colspan="3" class="text-end">Total:</th>
-        <th id="totalPrice">0.00</th>
-      </tr>
-    </tfoot>
-  </table>
-</div>
-
-<script>
-const events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
-const tbody = document.querySelector("#budgetTable tbody");
-const totalPriceEl = document.getElementById("totalPrice");
+// ======== Selección de elementos ========
+const calendar = document.getElementById("calendar");
+const weekdaysDiv = document.getElementById("weekdays");
 const monthSelect = document.getElementById("monthSelect");
 const yearSelect = document.getElementById("yearSelect");
+const modal = new bootstrap.Modal(document.getElementById("eventModal"));
+const selectedDateText = document.getElementById("selectedDateText");
+const setExamBtn = document.getElementById("setExam");
+const setExtraBtn = document.getElementById("setExtra");
+const setCallBtn = document.getElementById("setCall");
+const clearDayBtn = document.getElementById("clearDay");
+const examInputContainer = document.getElementById("examInputContainer");
+const examNumberInput = document.getElementById("examNumber");
+const saveExamNumberBtn = document.getElementById("saveExamNumber");
+const extraInputContainer = document.getElementById("extraInputContainer");
+const extraNumberInput = document.getElementById("extraNumber");
+const saveExtraNumberBtn = document.getElementById("saveExtraNumber");
+const examInfo = document.getElementById("examInfo");
 
+// ======== Datos ========
 const monthNames = [
-  "Enero","Febrero","Marzo","Abril","Mayo","Junio",
-  "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
+const dayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
-// Inicializar selectores
+let events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
+let selectedDate = null;
+
+// ======== Funciones ========
+
+// Renderiza los días de la semana
+function renderWeekdays() {
+  weekdaysDiv.innerHTML = "";
+  dayNames.forEach(day => {
+    const div = document.createElement("div");
+    div.textContent = day;
+    div.classList.add("text-center", "fw-bold");
+    weekdaysDiv.appendChild(div);
+  });
+}
+
+// Inicializa los selectores de mes y año
 function initSelectors() {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -104,107 +63,178 @@ function initSelectors() {
   }
 }
 
-// 🧮 Calcular clases extra (con condición de sábado)
-function calcularClasesExtra(numClases, fechaStr) {
-  const rows = [];
-  const fecha = new Date(fechaStr);
-  const esSabado = fecha.getDay() === 6; // 6 = sábado
-
-  if (esSabado) {
-    // Si es sábado → todas a 15.71 €
-    for (let i = 1; i <= numClases; i++) {
-      rows.push({desc: `Clase ${i}`, precio: 15.71});
-    }
-  } else {
-    // Si no es sábado → la 1ª a 19 €, las demás a 15.71 €
-    if (numClases >= 1) rows.push({desc: "Clase 1", precio: 19});
-    for (let i = 2; i <= numClases; i++) {
-      rows.push({desc: `Clase ${i}`, precio: 15.71});
-    }
-  }
-
-  return { rows, esSabado };
+// Limpia botones activos en el modal
+function clearActiveButtons() {
+  const buttons = document.querySelectorAll(".modal-body .btn");
+  buttons.forEach(btn => btn.classList.remove("active"));
 }
 
-// Renderizar tabla según mes/año
-function renderTable() {
-  tbody.innerHTML = "";
-  let totalPrice = 0;
+// Renderiza el calendario completo
+function renderCalendar() {
+  calendar.innerHTML = "";
+  examInfo.innerHTML = "";
+
+  const month = parseInt(monthSelect.value);
+  const year = parseInt(yearSelect.value);
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  let startDay = firstDay.getDay();
+  if (startDay === 0) startDay = 7;
+
+  // Espacios vacíos iniciales
+  for (let i = 1; i < startDay; i++) {
+    const empty = document.createElement("div");
+    calendar.appendChild(empty);
+  }
+
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const date = `${year}-${month + 1}-${day}`;
+    const div = document.createElement("div");
+    div.className = "day";
+    div.innerHTML = `<div class="fw-bold">${day}</div>`;
+
+    const event = events[date];
+
+    // Colores por tipo
+    if (event?.type === "examen") div.classList.add("day-red");
+    else if (event?.type === "extra") div.classList.add("day-blue");
+
+    // Llamada post-examen
+    if (event?.call) div.classList.add("day-call");
+
+    // Texto dentro de la casilla
+    if (event?.type === "examen") {
+      div.innerHTML += `<div></div>`;
+      const infoP = document.createElement("p");
+      infoP.textContent = `El ${day.toString().padStart(2,"0")}/${(month+1).toString().padStart(2,"0")}/${year} subieron ${event.alumnos} alumnos a examen.`;
+      infoP.style.color = "black";
+      examInfo.appendChild(infoP);
+    } else if (event?.type === "extra") {
+      div.innerHTML += `<div>${event.clases} ext</div>`;
+    }
+
+    // Evento click para modal
+    div.addEventListener("click", () => {
+      selectedDate = date;
+      selectedDateText.textContent = `Día ${day} de ${monthNames[month]} de ${year}`;
+      examInputContainer.style.display = "none";
+      extraInputContainer.style.display = "none";
+      examNumberInput.value = "";
+      extraNumberInput.value = "";
+      clearActiveButtons();
+      modal.show();
+    });
+
+    calendar.appendChild(div);
+  }
+}
+
+// ======== Eventos del modal ========
+
+// Examen
+setExamBtn.addEventListener("click", () => {
+  examInputContainer.style.display = "block";
+  extraInputContainer.style.display = "none";
+  clearActiveButtons();
+  setExamBtn.classList.add("active");
+});
+
+// Guardar examen
+saveExamNumberBtn.addEventListener("click", () => {
+  const num = parseInt(examNumberInput.value);
+  if (selectedDate && num > 0) {
+    events[selectedDate] = { type: "examen", alumnos: num };
+    localStorage.setItem("calendarEvents", JSON.stringify(events));
+    modal.hide();
+    renderCalendar();
+  }
+});
+
+// Clases extra
+setExtraBtn.addEventListener("click", () => {
+  extraInputContainer.style.display = "block";
+  examInputContainer.style.display = "none";
+  clearActiveButtons();
+  setExtraBtn.classList.add("active");
+});
+
+// Guardar clases extra
+saveExtraNumberBtn.addEventListener("click", () => {
+  const num = parseInt(extraNumberInput.value);
+  if (selectedDate && num >= 1 && num <= 7) {
+    events[selectedDate] = { type: "extra", clases: num };
+    localStorage.setItem("calendarEvents", JSON.stringify(events));
+    modal.hide();
+    renderCalendar();
+  }
+});
+
+// Llamada post-examen
+setCallBtn.addEventListener("click", () => {
+  if (selectedDate) {
+    if (!events[selectedDate]) events[selectedDate] = {};
+    events[selectedDate].call = true;
+    localStorage.setItem("calendarEvents", JSON.stringify(events));
+    clearActiveButtons();
+    setCallBtn.classList.add("active");
+    modal.hide();
+    renderCalendar();
+  }
+});
+
+// Borrar día
+clearDayBtn.addEventListener("click", () => {
+  if (selectedDate) {
+    delete events[selectedDate];
+    localStorage.setItem("calendarEvents", JSON.stringify(events));
+    clearActiveButtons();
+    modal.hide();
+    renderCalendar();
+  }
+});
+
+// Exportar PDF
+document.getElementById("exportPDF").addEventListener("click", async () => {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("landscape", "mm", "a4");
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
 
-  const filteredDates = Object.keys(events)
-    .filter(dateStr => {
-      const d = new Date(dateStr);
-      return d.getMonth() === month && d.getFullYear() === year;
-    })
-    .sort((a, b) => {
-      const eA = events[a];
-      const eB = events[b];
-      const order = {"extra": 1, "examen": 2, "call": 3};
-      return (order[eA.type || (eA.call ? "call" : "")] || 99) -
-             (order[eB.type || (eB.call ? "call" : "")] || 99);
-    });
+  const controls = document.querySelector(".d-flex");
+  const exportBtn = document.getElementById("exportPDF");
+  if (controls) controls.style.display = "none";
+  if (exportBtn) exportBtn.style.display = "none";
 
-  filteredDates.forEach(date => {
-    const e = events[date];
+  await new Promise(r => setTimeout(r, 250));
 
-    // Clases extra
-    if (e.type === "extra") {
-      const { rows: clases, esSabado } = calcularClasesExtra(e.clases, date);
-      const eventoTexto = esSabado ? `${e.clases} ext sábado` : `${e.clases} ext`;
+  const container = document.querySelector(".container");
+  container.style.height = "auto";
+  container.style.overflow = "visible";
 
-      clases.forEach((c, i) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          ${i === 0 ? `<td rowspan="${clases.length}">${date}</td><td rowspan="${clases.length}">${eventoTexto}</td>` : ""}
-          <td>${c.desc}</td>
-          <td>${c.precio.toFixed(2)}</td>
-        `;
-        tbody.appendChild(tr);
-        totalPrice += c.precio;
-      });
-    }
-
-    // Examen
-    if (e.type === "examen") {
-      const tr = document.createElement("tr");
-      const precio = e.alumnos * 5;
-      tr.innerHTML = `
-        <td>${date}</td>
-        <td>Examen</td>
-        <td>${e.alumnos} alumno(s)</td>
-        <td>${precio.toFixed(2)}</td>
-      `;
-      tbody.appendChild(tr);
-      totalPrice += precio;
-    }
-
-    // Llamada post-examen
-    if (e.call) {
-      const tr = document.createElement("tr");
-      const precio = 20;
-      tr.innerHTML = `
-        <td>${date}</td>
-        <td>Llamada post-examen</td>
-        <td>1 llamada</td>
-        <td>${precio.toFixed(2)}</td>
-      `;
-      tbody.appendChild(tr);
-      totalPrice += precio;
-    }
+  const canvas = await html2canvas(container, { 
+    scale: 2, useCORS: true, scrollY: -window.scrollY,
+    windowWidth: document.documentElement.offsetWidth,
+    windowHeight: document.documentElement.offsetHeight
   });
 
-  totalPriceEl.textContent = totalPrice.toFixed(2);
-}
+  const imgData = canvas.toDataURL("image/png");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const imgWidth = pageWidth - 20;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  pdf.text(`Calendario — ${monthNames[month]} ${year}`, 10, 10);
+  pdf.addImage(imgData, "PNG", 10, 20, imgWidth, imgHeight);
+  pdf.save(`Calendario_${monthNames[month]}_${year}.pdf`);
+
+  if (controls) controls.style.display = "flex";
+  if (exportBtn) exportBtn.style.display = "inline-block";
+});
+
+// Cambios de mes/año
+monthSelect.addEventListener("change", renderCalendar);
+yearSelect.addEventListener("change", renderCalendar);
 
 // Inicialización
 initSelectors();
-renderTable();
-monthSelect.addEventListener("change", renderTable);
-yearSelect.addEventListener("change", renderTable);
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+renderWeekdays();
+renderCalendar();
