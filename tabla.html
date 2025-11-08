@@ -239,7 +239,7 @@ document.getElementById("downloadPDF").addEventListener("click", () => {
 
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
-  const title = `Presupuesto — ${monthNames[month]} ${year}`;
+  const title = `Desglose Extras — ${monthNames[month]} ${year}`;
 
   pdf.setFontSize(14);
   pdf.text(title, 10, 10);
