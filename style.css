@@ -1,172 +1,152 @@
-/* ====== DÍAS DE LA SEMANA ====== */
 .weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  font-size: 0.70rem;   /* tamaño pequeño */
-  text-align: center;
-  margin-bottom: 4px;
-}
-
-.weekdays div {
-  padding: 6px 0;
-  background-color: #f1f3f4;
-  border-radius: 4px;
-}
-
-/* ====== CALENDARIO ====== */
-.calendar {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  font-size: 0.9rem;
-}
-
-.day {
-  border-radius: 8px;
-  text-align: center;
-  padding: 8px;
-  cursor: pointer;
-  min-height: 65px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  transition: transform 0.1s;
-  border: 1px solid #ddd;
-  position: relative;
-}
-
-.day:hover {
-  transform: scale(1.05);
-  background-color: #f8f9fa;
-}
-
-.day.today {
-  border: 2px solid #2196f3;
-}
-
-/* ====== EXÁMEN ====== */
-.day.day-red {
-  background-color: #ffcdd2 !important;
-  border-color: #e57373;
-}
-
-/* ====== EXTRA ====== */
-.day.day-blue {
-  background-color: #cce5ff !important;
-  border-color: #007bff;
-}
-
-/* ====== TEXTO INTERNO ====== */
-.day div {
-  font-size: 0.7rem; /* 🔹 reducido */
-  line-height: 1.1;
-  word-wrap: break-word;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.day .extra-number {
-  font-size: 1.2em;
-  font-weight: bold;
-  display: block;
-  line-height: 1;
-}
-
-/* ====== Tonos según cantidad de extras ====== */
-.day.extra-1 { background-color: #cce5ff; border-color: #007bff; }
-.day.extra-2 { background-color: #b3d7ff; border-color: #007bff; }
-.day.extra-3 { background-color: #99c9ff; border-color: #007bff; }
-.day.extra-4 { background-color: #80bbff; border-color: #007bff; }
-.day.extra-5 { background-color: #66adff; border-color: #007bff; }
-.day.extra-6 { background-color: #4da0ff; border-color: #007bff; }
-.day.extra-7 { background-color: #3392ff; border-color: #007bff; }
-
-/* ====== INFORMACION DE EXÁMENES ====== */
-#examInfo p {
-  text-decoration: underline;
-  text-decoration-color: red;
-  margin-bottom: 4px;
-  color: #b71c1c;
-  font-weight: 500;
-}
-
-/* ====== LLAMADA POST EXAMEN ====== */
-.day-call::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 12px;
-  background-color: #28a745;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-
-/* ====== BOTONES DEL MODAL ====== */
-.modal-body .btn {
-  opacity: 0.6;
-  transition: opacity 0.2s, transform 0.1s;
-}
-
-.modal-body .btn:hover {
-  opacity: 0.8;
-  transform: scale(1.05);
-}
-
-.modal-body .btn.active {
-  opacity: 1;
-  font-weight: bold;
-}
-
-/* ====== SPLIT HORIZONTAL (EXAMEN + EXTRA) ====== */
-.day.split {
-  position: relative;
-  overflow: hidden;
-  background: none !important;
-  border: 2px solid transparent; /* borde visible general */
-}
-
-/* MITAD SUPERIOR (AZUL - EXTRA) */
-.day.split::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100% !important;
-  height: 50% !important;
-  background-color: #cce5ff; /* azul extra */
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  pointer-events: none;
-  z-index: 0;
-  border: 2px solid #007bff; /* borde azul más fuerte */
-}
-
-/* MITAD INFERIOR (ROJO - EXAMEN) */
-.day.split::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100% !important;
-  height: 50% !important;
-  background-color: #ffcdd2; /* rojo examen */
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  pointer-events: none;
-  z-index: 0;
-  border: 2px solid #dc3545; /* borde rojo más fuerte */
-}
-
-/* Asegura que el contenido quede encima del split */
-.day.split * {
-  position: relative;
-  z-index: 1;
-}
-
+ display: grid;
+ grid-template-columns: repeat(7, 1fr);
+ font-size: 0.85rem;
+ text-align: center;
+ margin-bottom: 4px;
+ }
+ 
+ .weekdays div {
+ padding: 6px 0;
+ background-color: #f1f3f4;
+ border-radius: 4px;
+ }
+ 
+ .calendar {
+ display: grid;
+ grid-template-columns: repeat(7, 1fr);
+ gap: 4px;
+ font-size: 0.9rem;
+ }
+ 
+ .day {
+ border-radius: 8px;
+ text-align: center;
+ padding: 8px;
+ cursor: pointer;
+ min-height: 65px;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ transition: transform 0.1s;
+ border: 1px solid #ddd;
+ }
+ 
+ .day:hover {
+ transform: scale(1.05);
+ background-color: #f8f9fa;
+ }
+ 
+ .day.today {
+ border: 2px solid #2196f3;
+ }
+ 
+ /* Examen */
+ .day.day-red {
+ background-color: #ffcdd2 !important;
+ border-color: #e57373;
+ }
+ 
+ /* Clases extra: azul */
+ .day.day-blue {
+ background-color: #cce5ff !important;
+ border-color: #007bff;
+ }
+ 
+ .day div {
+ font-size: 0.85rem; /* texto normal */
+ line-height: 1.1;
+ word-wrap: break-word; /* permite que el texto se divida si hace falta */
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ }
+ 
+ .day .extra-number {
+ font-size: 1.2em; /* un poco más grande, relativo al texto de la casilla */
+ font-weight: bold;
+ display: block;
+ line-height: 1;
+ }
+ 
+ 
+ /* Diferentes tonos de azul según la cantidad de clases extra */
+ .day.extra-1 { background-color: #cce5ff; border-color: #007bff; }
+ .day.extra-2 { background-color: #b3d7ff; border-color: #007bff; }
+ .day.extra-3 { background-color: #99c9ff; border-color: #007bff; }
+ .day.extra-4 { background-color: #80bbff; border-color: #007bff; }
+ .day.extra-5 { background-color: #66adff; border-color: #007bff; }
+ .day.extra-6 { background-color: #4da0ff; border-color: #007bff; }
+ .day.extra-7 { background-color: #3392ff; border-color: #007bff; }
+ 
+ /* Frases de exámenes subrayadas en rojo */
+ #examInfo p {
+ text-decoration: underline;
+ text-decoration-color: red;
+ margin-bottom: 4px;
+ color: #b71c1c;
+ font-weight: 500;
+ }
+ 
+ /* Círculo verde para Llamada post-examen */
+ .day-call::before {
+ content: "";
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 12px; /* grosor de la barra */
+ background-color: #28a745; /* verde */
+ border-top-left-radius: 8px;
+ border-top-right-radius: 8px;
+ }
+ 
+ .day {
+ position: relative; /* necesario para colocar el círculo */
+ }
+ 
+ /* Botones del modal */
+ .modal-body .btn {
+ opacity: 0.6; /* color inicial más claro */
+ transition: opacity 0.2s, transform 0.1s;
+ }
+ 
+ .modal-body .btn:hover {
+ opacity: 0.8;
+ transform: scale(1.05);
+ }
+ 
+ /* Botón activo (seleccionado) */
+ .modal-body .btn.active {
+ opacity: 1;
+ font-weight: bold;
+ }
+ 
+ .day.split {
+ position: relative;
+ overflow: hidden;
+ }
+ 
+ .day.split::before,
+ .day.split::after {
+ content: "";
+ position: absolute;
+ top: 0;
+ width: 50%;
+ height: 100%;
+ z-index: -1;
+ }
+ 
+ .day.split::before {
+ left: 0;
+ background-color: #dc3545; /* rojo examen */
+ }
+ 
+ .day.split::after {
+ right: 0;
+ background-color: #0d6efd; /* azul extra */
+ }
 
 
 
