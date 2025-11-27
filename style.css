@@ -2,7 +2,7 @@
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  font-size: 0.70rem;   /* 🔹 Más pequeño como pediste */
+  font-size: 0.70rem;   /* tamaño pequeño */
   text-align: center;
   margin-bottom: 4px;
 }
@@ -56,9 +56,9 @@
   border-color: #007bff;
 }
 
-/* Texto dentro del día */
+/* ====== TEXTO INTERNO ====== */
 .day div {
-  font-size: 0.75rem;
+  font-size: 0.5rem; /* 🔹 reducido */
   line-height: 1.1;
   word-wrap: break-word;
   display: flex;
@@ -83,7 +83,7 @@
 .day.extra-6 { background-color: #4da0ff; border-color: #007bff; }
 .day.extra-7 { background-color: #3392ff; border-color: #007bff; }
 
-/* ====== Informacion de exámenes ====== */
+/* ====== INFORMACION DE EXÁMENES ====== */
 #examInfo p {
   text-decoration: underline;
   text-decoration-color: red;
@@ -121,46 +121,52 @@
   font-weight: bold;
 }
 
+/* ====== SPLIT HORIZONTAL (EXAMEN + EXTRA) ====== */
 .day.split {
   position: relative;
   overflow: hidden;
   background: none !important;
+  border: 2px solid transparent; /* borde visible general */
 }
 
-/* MITAD SUPERIOR (azul) */
+/* MITAD SUPERIOR (AZUL - EXTRA) */
 .day.split::before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
-
-  width: 100% !important;   /* fuerza ancho completo */
-  height: 50% !important;   /* solo mitad vertical */
-
+  width: 100% !important;
+  height: 50% !important;
   background-color: #cce5ff; /* azul extra */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   pointer-events: none;
+  z-index: 0;
+  border: 2px solid #007bff; /* borde azul más fuerte */
 }
 
-/* MITAD INFERIOR (rojo) */
+/* MITAD INFERIOR (ROJO - EXAMEN) */
 .day.split::after {
   content: "";
   position: absolute;
   left: 0;
   bottom: 0;
-
-  width: 100% !important;   /* fuerza ancho completo */
-  height: 50% !important;   /* solo mitad vertical */
-
+  width: 100% !important;
+  height: 50% !important;
   background-color: #ffcdd2; /* rojo examen */
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
   pointer-events: none;
-  border-color: #e57373;
+  z-index: 0;
+  border: 2px solid #dc3545; /* borde rojo más fuerte */
 }
 
-/* Asegura que el contenido del día quede visible */
+/* Asegura que el contenido quede encima del split */
 .day.split * {
   position: relative;
   z-index: 1;
 }
+
 
 
 
