@@ -1,7 +1,8 @@
+/* ====== DÍAS DE LA SEMANA ====== */
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  font-size: 0.85rem;
+  font-size: 0.70rem;   /* 🔹 Más pequeño como pediste */
   text-align: center;
   margin-bottom: 4px;
 }
@@ -12,6 +13,7 @@
   border-radius: 4px;
 }
 
+/* ====== CALENDARIO ====== */
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -30,6 +32,7 @@
   justify-content: center;
   transition: transform 0.1s;
   border: 1px solid #ddd;
+  position: relative;
 }
 
 .day:hover {
@@ -41,22 +44,23 @@
   border: 2px solid #2196f3;
 }
 
-/* Examen */
+/* ====== EXÁMEN ====== */
 .day.day-red {
   background-color: #ffcdd2 !important;
   border-color: #e57373;
 }
 
-/* Clases extra: azul */
+/* ====== EXTRA ====== */
 .day.day-blue {
   background-color: #cce5ff !important;
   border-color: #007bff;
 }
 
+/* Texto dentro del día */
 .day div {
-  font-size: 0.85rem; /* texto normal */
+  font-size: 0.85rem;
   line-height: 1.1;
-  word-wrap: break-word; /* permite que el texto se divida si hace falta */
+  word-wrap: break-word;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -64,14 +68,13 @@
 }
 
 .day .extra-number {
-  font-size: 1.2em; /* un poco más grande, relativo al texto de la casilla */
+  font-size: 1.2em;
   font-weight: bold;
   display: block;
   line-height: 1;
 }
 
-
-/* Diferentes tonos de azul según la cantidad de clases extra */
+/* ====== Tonos según cantidad de extras ====== */
 .day.extra-1 { background-color: #cce5ff; border-color: #007bff; }
 .day.extra-2 { background-color: #b3d7ff; border-color: #007bff; }
 .day.extra-3 { background-color: #99c9ff; border-color: #007bff; }
@@ -80,7 +83,7 @@
 .day.extra-6 { background-color: #4da0ff; border-color: #007bff; }
 .day.extra-7 { background-color: #3392ff; border-color: #007bff; }
 
-/* Frases de exámenes subrayadas en rojo */
+/* ====== Informacion de exámenes ====== */
 #examInfo p {
   text-decoration: underline;
   text-decoration-color: red;
@@ -89,26 +92,22 @@
   font-weight: 500;
 }
 
-/* Círculo verde para Llamada post-examen */
+/* ====== LLAMADA POST EXAMEN ====== */
 .day-call::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 12px; /* grosor de la barra */
-  background-color: #28a745; /* verde */
+  height: 12px;
+  background-color: #28a745;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
 
-.day {
-  position: relative; /* necesario para colocar el círculo */
-}
-
-/* Botones del modal */
+/* ====== BOTONES DEL MODAL ====== */
 .modal-body .btn {
-  opacity: 0.6;       /* color inicial más claro */
+  opacity: 0.6;
   transition: opacity 0.2s, transform 0.1s;
 }
 
@@ -117,12 +116,12 @@
   transform: scale(1.05);
 }
 
-/* Botón activo (seleccionado) */
 .modal-body .btn.active {
   opacity: 1;
   font-weight: bold;
 }
 
+/* ====== DÍA CON DOS EVENTOS (EXAMEN + EXTRA) ====== */
 .day.split {
   position: relative;
   overflow: hidden;
@@ -147,5 +146,7 @@
   right: 0;
   background-color: #0d6efd; /* azul extra */
 }
+
+
 
 
