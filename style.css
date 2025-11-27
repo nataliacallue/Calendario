@@ -121,41 +121,44 @@
   font-weight: bold;
 }
 
-/* SPLIT HORIZONTAL PARA DÍAS CON EXAMEN Y EXTRA */
 .day.split {
   position: relative;
   overflow: hidden;
-  background: none !important; /* evita conflictos */
+  background: none !important;
 }
 
-/* MITAD SUPERIOR (azul - extra) */
+/* MITAD SUPERIOR (azul) */
 .day.split::before {
   content: "";
   position: absolute;
-  top: 0;
   left: 0;
-  width: 100%;
-  height: 50%;
-  background-color: #cce5ff; /* mismo azul que .day-blue */
+  top: 0;
+
+  width: 100% !important;   /* fuerza ancho completo */
+  height: 50% !important;   /* solo mitad vertical */
+
+  background-color: #cce5ff; /* azul extra */
   pointer-events: none;
-  z-index: 0;
 }
 
-/* MITAD INFERIOR (rojo - examen) */
+/* MITAD INFERIOR (rojo) */
 .day.split::after {
   content: "";
   position: absolute;
-  bottom: 0;
   left: 0;
-  width: 100%;
-  height: 50%;
-  background-color: #ffcdd2; /* mismo rojo que .day-red */
+  bottom: 0;
+
+  width: 100% !important;   /* fuerza ancho completo */
+  height: 50% !important;   /* solo mitad vertical */
+
+  background-color: #ffcdd2; /* rojo examen */
   pointer-events: none;
-  z-index: 0;
 }
 
-/* Asegura que el contenido vaya por encima */
+/* Asegura que el contenido del día quede visible */
 .day.split * {
   position: relative;
   z-index: 1;
 }
+
+
