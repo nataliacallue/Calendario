@@ -124,33 +124,41 @@
 /* ====== DÍA CON DOS EVENTOS (EXAMEN + EXTRA) ====== */
 /* ====== SPLIT HORIZONTAL (EXAMEN + EXTRA) ====== */
 /* SPLIT HORIZONTAL PARA DÍAS CON EXAMEN + EXTRA */
+/* SPLIT HORIZONTAL PARA DÍAS CON EXAMEN + EXTRA */
 .day.split {
   position: relative;
-  background-color: transparent !important; /* evita que tape el split */
+  overflow: hidden;
+  background: none !important; /* evita que tape el split */
 }
 
-/* Parte superior = EXAMEN */
+/* EXAMEN (arriba) */
 .day.split::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
   height: 50%;
-  background-color: #ffcdd2; /* exactamente tu color examen */
+  width: 100%;
+  display: block;
+  background-color: #ffcdd2; /* EXACTO color examen */
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  pointer-events: none;
 }
 
-/* Parte inferior = EXTRA */
+/* EXTRA (abajo) */
 .day.split::after {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
   height: 50%;
-  background-color: #cce5ff; /* exactamente tu color extra */
+  width: 100%;
+  display: block;
+  background-color: #cce5ff; /* EXACTO color extra */
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+  pointer-events: none;
 }
+
+
