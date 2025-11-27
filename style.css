@@ -122,3 +122,30 @@
   opacity: 1;
   font-weight: bold;
 }
+
+.day.split {
+  position: relative;
+  overflow: hidden;
+}
+
+.day.split::before,
+.day.split::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  z-index: -1;
+}
+
+.day.split::before {
+  left: 0;
+  background-color: #dc3545; /* rojo examen */
+}
+
+.day.split::after {
+  right: 0;
+  background-color: #0d6efd; /* azul extra */
+}
+
+
