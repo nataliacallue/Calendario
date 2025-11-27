@@ -95,24 +95,36 @@ function renderCalendar() {
 
     const event = events[date];
 
-    // Colores por tipo
-    if (event?.type === "examen") div.classList.add("day-red");
-    else if (event?.type === "extra") div.classList.add("day-blue");
+    // -----------------------------
+    //     COLORES SEGÚN EVENTOS
+    // -----------------------------
+    if (event) {
+      const hasExam = !!event.examen;
+      const hasExtra = !!event.extra;
+
+      if (hasExam && hasExtra) {
+        div.classList.add("split");
+      } else if (hasExam) {
+        div.classList.add("day-red");
+      } else if (hasExtra) {
+        div.classList.add("day-blue");
+      }
+    }
 
     // Llamada post-examen
     if (event?.call) div.classList.add("day-call");
 
-    if (event?.type === "examen") {
-    div.innerHTML += `<div>${event.alumnos} Al.s</div>`; // Muestra número de alumnos
-    // Información debajo en la leyenda
-    const infoP = document.createElement("p");
-    infoP.textContent = `El ${day.toString().padStart(2,"0")}/${(month+1).toString().padStart(2,"0")}/${year} subieron ${event.alumnos} alumnos a examen.`;
-    infoP.style.color = "black";
-    examInfo.appendChild(infoP);
-    } else if (event?.type === "extra") {
-    div.innerHTML += `<div>${event.clases} ext</div>`;
+    // Mostrar info dentro del día
+    if (event?.examen) {
+      div.innerHTML += `<div>${event.examen.alumnos} Al.s</div>`;
+      const infoP = document.createElement("p");
+      infoP.textContent = `El ${day}/${month + 1}/${year} subieron ${event.examen.alumnos} alumnos a examen.`;
+      examInfo.appendChild(infoP);
     }
 
+    if (event?.extra) {
+      div.innerHTML += `<div>${event.extra.clases} ext</div>`;
+    }
 
     // Evento click para modal
     div.addEventListener("click", () => {
@@ -144,7 +156,8 @@ setExamBtn.addEventListener("click", () => {
 saveExamNumberBtn.addEventListener("click", () => {
   const num = parseInt(examNumberInput.value);
   if (selectedDate && num > 0) {
-    events[selectedDate] = { type: "examen", alumnos: num };
+    if (!events[selectedDate]) events[selectedDate] = {};
+    events[selectedDate].examen = { alumnos: num };
     localStorage.setItem("calendarEvents", JSON.stringify(events));
     modal.hide();
     renderCalendar();
@@ -163,7 +176,8 @@ setExtraBtn.addEventListener("click", () => {
 saveExtraNumberBtn.addEventListener("click", () => {
   const num = parseInt(extraNumberInput.value);
   if (selectedDate && num >= 1 && num <= 7) {
-    events[selectedDate] = { type: "extra", clases: num };
+    if (!events[selectedDate]) events[selectedDate] = {};
+    events[selectedDate].extra = { clases: num };
     localStorage.setItem("calendarEvents", JSON.stringify(events));
     modal.hide();
     renderCalendar();
@@ -239,4 +253,5 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
 
