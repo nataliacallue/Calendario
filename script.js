@@ -109,7 +109,7 @@ function renderCalendar() {
 
       if (event.call) div.classList.add("day-call");
       if (hasExtra) {
-        div.innerHTML += `<div style="font-size:0.7rem;margin-botton=2px;">${event.clases} ext</div>`;
+        div.innerHTML += `<div style="font-size:0.7rem;margin-botton:2px;">${event.clases} ext</div>`;
       }
 
       if (hasExam) {
@@ -263,5 +263,6 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
 
 
