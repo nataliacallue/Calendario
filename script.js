@@ -233,6 +233,7 @@ document.getElementById("exportPDF").addEventListener("click", async () => {
   const month = parseInt(monthSelect.value);
   const year = parseInt(yearSelect.value);
 
+  // Ocultar selectores y botón de exportar
   const controls = document.querySelector(".d-flex");
   const exportBtn = document.getElementById("exportPDF");
   if (controls) controls.style.display = "none";
@@ -255,13 +256,20 @@ document.getElementById("exportPDF").addEventListener("click", async () => {
   const imgWidth = pageWidth - 20;
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
+  // Título más pequeño
+  pdf.setFontSize(12); // antes 14
   pdf.text(`Calendario — ${monthNames[month]} ${year}`, 10, 10);
-  pdf.addImage(imgData, "PNG", 10, 20, imgWidth, imgHeight);
+
+  // Imagen del calendario sube más arriba
+  pdf.addImage(imgData, "PNG", 10, 15, imgWidth, imgHeight);
+
   pdf.save(`Calendario_${monthNames[month]}_${year}.pdf`);
 
+  // Restaurar controles
   if (controls) controls.style.display = "flex";
   if (exportBtn) exportBtn.style.display = "inline-block";
 });
+
 
 // Cambios de mes/año
 monthSelect.addEventListener("change", renderCalendar);
@@ -271,6 +279,7 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
 
 
 
