@@ -111,8 +111,8 @@ function renderCalendar() {
 
   if (hasExtra && hasExam) {
     div.innerHTML += `
-      <div style="font-size:0.7rem; margin-bottom:4px;">${event.clases} ext</div>
-      <div style="font-size:0.7rem; margin-top:4px;">${event.alumnos} Al.s</div>
+      <div style="font-size:0.7rem; margin-bottom:6px;">${event.clases} ext</div>
+      <div style="font-size:0.7rem; margin-top:6px;">${event.alumnos} Al.s</div>
     `;
   } else if (hasExtra) {
     div.innerHTML += `<div style="font-size:0.7rem;">${event.clases} ext</div>`;
@@ -123,6 +123,7 @@ function renderCalendar() {
   if (hasExam) {
     const infoP = document.createElement("p");
     infoP.textContent = `El ${day}/${month + 1}/${year} subieron ${event.alumnos} alumnos a examen.`;
+    infoP.style.fontSize = "0.7rem"; 
     examInfo.appendChild(infoP);
   }
 }
@@ -270,6 +271,7 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
 
 
 
