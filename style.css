@@ -2,7 +2,7 @@
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  font-size: 0.5rem;   /* 🔹 Más pequeño como pediste */
+  font-size: 0.7rem;   /* 🔹 Más pequeño como pediste */
   text-align: center;
   margin-bottom: 4px;
 }
@@ -18,7 +18,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
-  font-size: 0.5rem;
+  font-size: 0.7rem;
 }
 
 .day {
@@ -58,7 +58,7 @@
 
 /* Texto dentro del día */
 .day div {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   line-height: 1.1;
   word-wrap: break-word;
   display: flex;
@@ -162,6 +162,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
