@@ -135,36 +135,50 @@
 
       const hasExam = !!e.alumnos;
       const hasExtra = !!e.clases;
+// ---------- EXAMEN + EXTRAS (SPLIT) ----------
+if (hasExam && hasExtra) {
 
-      // ---------- EXAMEN + EXTRAS (SPLIT) ----------
-      if (hasExam && hasExtra) {
-        // obtener listado desglosado de extras
-        const { rows: clasesExtra } = calcularClasesExtra(e.clases, e.date);
-        const precioExamen = e.alumnos * 5;
-        const precioExtraTotal = clasesExtra.reduce((s,c) => s + c.precio, 0);
+  // ===== EXAMEN (fila independiente) =====
+  const precioExamen = e.alumnos * 5;
+  const trExam = document.createElement("tr");
+  trExam.innerHTML = `
+      <td>${fechaStr}</td>
+      <td>Examen</td>
+      <td>${e.alumnos} alumno(s)</td>
+      <td>${precioExamen.toFixed(2)}</td>
+  `;
+  tbody.appendChild(trExam);
+  totalPrice += precioExamen;
 
-        // Fila inicial con examen (y celdas rowspan para fecha/evento)
-        const trExam = document.createElement("tr");
-        trExam.innerHTML = `
-          <td rowspan="${1 + clasesExtra.length}">${fechaStr}</td>
-          <td rowspan="${1 + clasesExtra.length}">Examen + ${e.clases} extra${e.clases > 1 ? "s" : ""}</td>
-          <td>Examen: ${e.alumnos} alumno(s)</td>
-          <td>${precioExamen.toFixed(2)}</td>
-        `;
-        tbody.appendChild(trExam);
-        totalPrice += precioExamen;
+  // ===== EXTRAS (bloque aparte con desglose) =====
+  const { rows: clasesExtra, esSabado } = calcularClasesExtra(e.clases, e.date);
+  const eventoTexto = esSabado
+        ? `${e.clases} extras sábado`
+        : `${e.clases} extra${e.clases > 1 ? "s" : ""}`;
 
-        // Filas por cada clase extra (desglosadas)
-        clasesExtra.forEach(c => {
-          const trC = document.createElement("tr");
-          trC.innerHTML = `
-            <td>${c.desc}</td>
-            <td>${c.precio.toFixed(2)}</td>
-          `;
-          tbody.appendChild(trC);
-          totalPrice += c.precio;
-        });
-      }
+  clasesExtra.forEach((c, i) => {
+    const tr = document.createElement("tr");
+
+    // Primera fila de extras muestra fecha y nombre del evento
+    if (i === 0) {
+      tr.innerHTML = `
+        <td rowspan="${clasesExtra.length}">${fechaStr}</td>
+        <td rowspan="${clasesExtra.length}">${eventoTexto}</td>
+        <td>${c.desc}</td>
+        <td>${c.precio.toFixed(2)}</td>
+      `;
+    } else {
+      tr.innerHTML = `
+        <td>${c.desc}</td>
+        <td>${c.precio.toFixed(2)}</td>
+      `;
+    }
+
+    tbody.appendChild(tr);
+    totalPrice += c.precio;
+  });
+}
+
 
       // ---------- SOLO EXAMEN ----------
       else if (hasExam) {
