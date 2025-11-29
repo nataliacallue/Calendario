@@ -18,7 +18,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
-  font-size: 0.7rem;
+  font-size: 0.5rem;
 }
 
 .day {
@@ -58,7 +58,7 @@
 
 /* Texto dentro del día */
 .day div {
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   line-height: 1.1;
   word-wrap: break-word;
   display: flex;
@@ -152,6 +152,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
