@@ -183,7 +183,7 @@
       // ---------- SOLO EXTRAS ----------
       else if (hasExtra) {
         const { rows: clases, esSabado } = calcularClasesExtra(e.clases, e.date);
-        const eventoTexto = esSabado ? `${e.clases} ext sábado` : `${e.clases} ext`;
+        const eventoTexto = esSabado ? `${e.clases} ext sábado` : `${e.clases} extra${e.clases > 1 ? "s" : ""}`;
 
         clases.forEach((c, i) => {
           const tr = document.createElement("tr");
