@@ -239,7 +239,7 @@ if (hasExam && hasExtra) {
     const pdf = new jsPDF("p", "mm", "a4");
     const month = parseInt(monthSelect.value);
     const year = parseInt(yearSelect.value);
-    const title = `Presupuesto — ${monthNames[month]} ${year}`;
+    const title = `Extras ${monthNames[month]} ${year}`;
 
     pdf.setFontSize(14);
     pdf.text(title, 10, 10);
