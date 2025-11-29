@@ -58,7 +58,7 @@
 
 /* Texto dentro del día */
 .day div {
-  font-size: 1.2rem;
+  font-size: 0.7rem;
   line-height: 1.1;
   word-wrap: break-word;
   display: flex;
@@ -127,7 +127,8 @@
   width: 100%;
   height: 50%;
   background-color: #cce5ff; /* azul extra trasparente */
-  border-color: #007bff;
+  border: 2px solid #007bff;
+  border-bottom: none;
   pointer-events: none;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -141,7 +142,8 @@
   width: 100%;
   height: 50%;
   background-color: #ffcdd2; /* rojo examen trasparente */
-  border-color: #e57373;
+  border: 2px solid #e57373;
+  border-top: none;
   pointer-events: none;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
@@ -152,6 +154,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
