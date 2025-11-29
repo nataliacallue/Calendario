@@ -58,7 +58,7 @@
 
 /* Texto dentro del día */
 .day div {
-  font-size: 0.7rem;
+  font-size: 1.2rem;
   line-height: 1.1;
   word-wrap: break-word;
   display: flex;
@@ -80,7 +80,7 @@
   text-decoration-color: red;
   margin-bottom: 4px;
   color: #000000;
-  font-weight: 300;
+  font-weight: 100;
 }
 
 /* ====== LLAMADA POST EXAMEN ====== */
@@ -152,6 +152,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
