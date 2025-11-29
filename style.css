@@ -79,8 +79,8 @@
   text-decoration: underline;
   text-decoration-color: red;
   margin-bottom: 4px;
-  color: #b71c1c;
-  font-weight: 500;
+  color: #000000;
+  font-weight: 300;
 }
 
 /* ====== LLAMADA POST EXAMEN ====== */
@@ -152,6 +152,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
