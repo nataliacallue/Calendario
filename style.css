@@ -78,6 +78,7 @@
 #examInfo p {
   text-decoration: underline;
   text-decoration-color: red;
+  text-underline-offset: 2px;
   margin-bottom: 4px;
   color: #000000;
   font-weight: 400;
@@ -162,6 +163,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
