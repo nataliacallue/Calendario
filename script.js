@@ -96,30 +96,37 @@ function renderCalendar() {
     const event = events[date];
 
     if (event) {
-      const hasExam = !!event.alumnos;
-      const hasExtra = !!event.clases;
+  const hasExam = !!event.alumnos;
+  const hasExtra = !!event.clases;
 
-      if (hasExam && hasExtra) {
-        div.classList.add("split"); // split horizontal
-      } else if (hasExam) {
-        div.classList.add("day-red");
-      } else if (hasExtra) {
-        div.classList.add("day-blue");
-      }
+  if (hasExam && hasExtra) {
+    div.classList.add("split"); // split horizontal
+  } else if (hasExam) {
+    div.classList.add("day-red");
+  } else if (hasExtra) {
+    div.classList.add("day-blue");
+  }
 
-      if (event.call) div.classList.add("day-call");
-      if (hasExtra) {
-        div.innerHTML += `<div style="font-size:0.7rem;margin-botton:2px;">${event.clases} ext</div>`;
-      }
+  if (event.call) div.classList.add("day-call");
 
-      if (hasExam) {
-        div.innerHTML += `<div style="font-size:0.6rem">${event.alumnos} Al.s</div>`;
-        const infoP = document.createElement("p");
-        infoP.textContent = `El ${day}/${month + 1}/${year} subieron ${event.alumnos} alumnos a examen.`;
-        examInfo.appendChild(infoP);
-      }
-      
-    }
+  if (hasExtra && hasExam) {
+    div.innerHTML += `
+      <div style="font-size:0.7rem; margin-bottom:6px;">${event.clases} ext</div>
+      <div style="font-size:0.7rem; margin-top:6px;">${event.alumnos} Al.s</div>
+    `;
+  } else if (hasExtra) {
+    div.innerHTML += `<div style="font-size:0.7rem;">${event.clases} ext</div>`;
+  } else if (hasExam) {
+    div.innerHTML += `<div style="font-size:0.7rem">${event.alumnos} Al.s</div>`;
+  }
+
+  if (hasExam) {
+    const infoP = document.createElement("p");
+    infoP.textContent = `El ${day}/${month + 1}/${year} subieron ${event.alumnos} alumnos a examen.`;
+    examInfo.appendChild(infoP);
+  }
+}
+
 
     // Evento click para modal
     div.addEventListener("click", () => {
@@ -263,6 +270,7 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
 
 
 
