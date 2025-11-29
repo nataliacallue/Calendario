@@ -108,16 +108,17 @@ function renderCalendar() {
       }
 
       if (event.call) div.classList.add("day-call");
+      if (hasExtra) {
+        div.innerHTML += `<div style="font-size:0.7rem">${event.clases} ext</div>`;
+      }
 
       if (hasExam) {
-        div.innerHTML += `<div style="font-size:0.5rem">${event.alumnos} Al.s</div>`;
+        div.innerHTML += `<div style="font-size:0.6rem">${event.alumnos} Al.s</div>`;
         const infoP = document.createElement("p");
         infoP.textContent = `El ${day}/${month + 1}/${year} subieron ${event.alumnos} alumnos a examen.`;
         examInfo.appendChild(infoP);
       }
-      if (hasExtra) {
-        div.innerHTML += `<div style="font-size:0.5rem">${event.clases} ext</div>`;
-      }
+      
     }
 
     // Evento click para modal
@@ -262,3 +263,4 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
