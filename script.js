@@ -226,12 +226,10 @@ clearDayBtn.addEventListener("click", () => {
   }
 });
 
-// Exportar PDF
+// Exportar PDF recortando solo calendario + info
 document.getElementById("exportPDF").addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("portrait", "mm", "a4");
-  const month = parseInt(monthSelect.value);
-  const year = parseInt(yearSelect.value);
 
   // Ocultar selectores y botón de exportar
   const controls = document.querySelector(".d-flex");
@@ -241,34 +239,36 @@ document.getElementById("exportPDF").addEventListener("click", async () => {
 
   await new Promise(r => setTimeout(r, 250));
 
-  const container = document.querySelector(".container");
-  container.style.height = "auto";
-  container.style.overflow = "visible";
+  // Crear un contenedor temporal con solo calendario + info
+  const tempContainer = document.createElement("div");
+  tempContainer.style.padding = "0";
+  tempContainer.style.background = "white"; // Fondo blanco para PDF
+  tempContainer.appendChild(document.getElementById("calendar").cloneNode(true));
+  tempContainer.appendChild(document.getElementById("examInfo").cloneNode(true));
+  document.body.appendChild(tempContainer);
 
-  const canvas = await html2canvas(container, { 
+  const canvas = await html2canvas(tempContainer, { 
     scale: 2, useCORS: true, scrollY: -window.scrollY,
-    windowWidth: document.documentElement.offsetWidth,
-    windowHeight: document.documentElement.offsetHeight
+    windowWidth: tempContainer.offsetWidth,
+    windowHeight: tempContainer.offsetHeight
   });
 
   const imgData = canvas.toDataURL("image/png");
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const imgWidth = pageWidth - 20;
+  const imgWidth = pageWidth - 20; // 10mm margen a cada lado
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-  // Título más pequeño
-  pdf.setFontSize(12); // antes 14
-  pdf.text(`Calendario — ${monthNames[month]} ${year}`, 10, 10);
+  pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+  pdf.save(`Calendario.pdf`);
 
-  // Imagen del calendario sube más arriba
-  pdf.addImage(imgData, "PNG", 10, 15, imgWidth, imgHeight);
-
-  pdf.save(`Calendario_${monthNames[month]}_${year}.pdf`);
+  // Limpiar contenedor temporal
+  document.body.removeChild(tempContainer);
 
   // Restaurar controles
   if (controls) controls.style.display = "flex";
   if (exportBtn) exportBtn.style.display = "inline-block";
 });
+
 
 
 // Cambios de mes/año
@@ -279,6 +279,7 @@ yearSelect.addEventListener("change", renderCalendar);
 initSelectors();
 renderWeekdays();
 renderCalendar();
+
 
 
 
