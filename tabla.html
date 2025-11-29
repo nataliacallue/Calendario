@@ -147,7 +147,7 @@
         const trExam = document.createElement("tr");
         trExam.innerHTML = `
           <td rowspan="${1 + clasesExtra.length}">${fechaStr}</td>
-          <td rowspan="${1 + clasesExtra.length}">Examen + Extras</td>
+          <td rowspan="${1 + clasesExtra.length}">Examen + ${e.clases} extra${e.clases > 1 ? "s" : ""}</td>
           <td>Examen: ${e.alumnos} alumno(s)</td>
           <td>${precioExamen.toFixed(2)}</td>
         `;
