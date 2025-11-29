@@ -131,6 +131,7 @@
   width: 100%;
   height: 50%;
   background-color: #cce5ff; /* azul extra */
+  border-top: 1px solid #007bff;
   pointer-events: none;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -145,6 +146,7 @@
   width: 100%;
   height: 50%;
   background-color: #ffcdd2; /* rojo examen */
+  border-bottom: 1px solid #e57373;
   pointer-events: none;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
@@ -156,6 +158,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
