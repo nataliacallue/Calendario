@@ -115,9 +115,12 @@
 /* ====== SPLIT HORIZONTAL ====== */
 .day.split {
   position: relative;
+  border: none; /* quitamos el borde gris */
+  border-radius: 8px;
+  background: linear-gradient(to bottom, #cce5ff 50%, #ffcdd2 50%);
   overflow: hidden;
-  border: 1px solid #ddd;  /* mismo grosor que los demás días */
 }
+
 
 /* Mitad de extras (arriba) */
 .day.split::before {
@@ -153,6 +156,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
