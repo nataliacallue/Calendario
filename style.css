@@ -80,7 +80,7 @@
   text-decoration-color: red;
   margin-bottom: 4px;
   color: #000000;
-  font-weight: 100;
+  font-weight: 400;
 }
 
 /* ====== LLAMADA POST EXAMEN ====== */
@@ -162,6 +162,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 
 
