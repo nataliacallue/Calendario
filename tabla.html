@@ -97,14 +97,25 @@
     const fecha = new Date(safeDate(fechaStr));
     const esSabado = fecha.getDay() === 6; // 6 = sábado
 
-    if (esSabado) {
+    // Comprobar si es a partir de marzo de 2026 (mes 2 en JS)
+    const aPartirDeMarzo2026 = fecha.getFullYear() > 2026 || (fecha.getFullYear() === 2026 && fecha.getMonth() >= 2);
+
+    if (aPartirDeMarzo2026) {
+      // Nueva lógica: todas las clases son a 19€
       for (let i = 1; i <= numClases; i++) {
-        rows.push({ desc: `Clase ${i}`, precio: 15.71 });
+        rows.push({ desc: `Clase ${i}`, precio: 19 });
       }
     } else {
-      if (numClases >= 1) rows.push({ desc: "Clase 1", precio: 19 });
-      for (let i = 2; i <= numClases; i++) {
-        rows.push({ desc: `Clase ${i}`, precio: 15.71 });
+      // Lógica antigua: antes de marzo 2026
+      if (esSabado) {
+        for (let i = 1; i <= numClases; i++) {
+          rows.push({ desc: `Clase ${i}`, precio: 15.71 });
+        }
+      } else {
+        if (numClases >= 1) rows.push({ desc: "Clase 1", precio: 19 });
+        for (let i = 2; i <= numClases; i++) {
+          rows.push({ desc: `Clase ${i}`, precio: 15.71 });
+        }
       }
     }
 
