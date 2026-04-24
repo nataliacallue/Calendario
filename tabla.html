@@ -126,10 +126,13 @@
   // ============================
   // Renderizar tabla (completa)
   // ============================
+ // ============================
+  // Renderizar tabla (completa)
+  // ============================
   function renderTable() {
     tbody.innerHTML = "";
     let totalPrice = 0;
-    let totalPracticesCount = 0; // NUEVA VARIABLE PARA EL CONTADOR
+    let totalPracticesCount = 0; // Contador de prácticas
 
     const month = parseInt(monthSelect.value);
     const year = parseInt(yearSelect.value);
@@ -149,46 +152,46 @@
       const hasExam = !!e.alumnos;
       const hasExtra = !!e.clases;
 
-      // SUMAR PRÁCTICAS AL CONTADOR
-      if (hasExtra) {
-        totalPracticesCount += parseInt(e.clases);
-      }
+      // SUMAR PRÁCTICAS AL CONTADOR
+      if (hasExtra) {
+        totalPracticesCount += parseInt(e.clases);
+      }
 
-      // ---------- EXAMEN + EXTRAS (SPLIT) ----------
-      if (hasExam && hasExtra) {
-        const precioExamen = e.alumnos * 5;
-        const trExam = document.createElement("tr");
-        trExam.innerHTML = `
-            <td>${fechaStr}</td>
-            <td>Examen</td>
-            <td>${e.alumnos} alumno(s)</td>
-            <td>${precioExamen.toFixed(2)}</td>
-        `;
-        tbody.appendChild(trExam);
-        totalPrice += precioExamen;
+      // ---------- EXAMEN + EXTRAS (SPLIT) ----------
+      if (hasExam && hasExtra) {
+        const precioExamen = e.alumnos * 5;
+        const trExam = document.createElement("tr");
+        trExam.innerHTML = `
+          <td>${fechaStr}</td>
+          <td>Examen</td>
+          <td>${e.alumnos} alumno(s)</td>
+          <td>${precioExamen.toFixed(2)}</td>
+        `;
+        tbody.appendChild(trExam);
+        totalPrice += precioExamen;
 
-        const { rows: clasesExtra, esSabado } = calcularClasesExtra(e.clases, e.date);
-        const eventoTexto = esSabado ? `${e.clases} extras sábado` : `${e.clases} extra${e.clases > 1 ? "s" : ""}`;
+        const { rows: clasesExtra, esSabado } = calcularClasesExtra(e.clases, e.date);
+        const eventoTexto = esSabado ? `${e.clases} extras sábado` : `${e.clases} extra${e.clases > 1 ? "s" : ""}`;
 
-        clasesExtra.forEach((c, i) => {
-          const tr = document.createElement("tr");
-          if (i === 0) {
-            tr.innerHTML = `
-              <td rowspan="${clasesExtra.length}">${fechaStr}</td>
-              <td rowspan="${clasesExtra.length}">${eventoTexto}</td>
-              <td>${c.desc}</td>
-              <td>${c.precio.toFixed(2)}</td>
-            `;
-          } else {
-            tr.innerHTML = `
-              <td>${c.desc}</td>
-              <td>${c.precio.toFixed(2)}</td>
-            `;
-          }
-          tbody.appendChild(tr);
-          totalPrice += c.precio;
-        });
-      }
+        clasesExtra.forEach((c, i) => {
+          const tr = document.createElement("tr");
+          if (i === 0) {
+            tr.innerHTML = `
+              <td rowspan="${clasesExtra.length}">${fechaStr}</td>
+              <td rowspan="${clasesExtra.length}">${eventoTexto}</td>
+              <td>${c.desc}</td>
+              <td>${c.precio.toFixed(2)}</td>
+            `;
+          } else {
+            tr.innerHTML = `
+              <td>${c.desc}</td>
+              <td>${c.precio.toFixed(2)}</td>
+            `;
+          }
+          tbody.appendChild(tr);
+          totalPrice += c.precio;
+        });
+      }
       // ---------- SOLO EXAMEN ----------
       else if (hasExam) {
         const precio = e.alumnos * 5;
@@ -209,11 +212,20 @@
 
         clases.forEach((c, i) => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-            ${i === 0 ? `<td rowspan="${clases.length}">${fechaStr}</td><td rowspan="${clases.length}">${eventoTexto}</td>` : ""}
-            <td>${c.desc}</td>
-            <td>${c.precio.toFixed(2)}</td>
-          `;
+          // Aquí está el cambio vital: if/else estricto
+          if (i === 0) {
+            tr.innerHTML = `
+              <td rowspan="${clases.length}">${fechaStr}</td>
+              <td rowspan="${clases.length}">${eventoTexto}</td>
+              <td>${c.desc}</td>
+              <td>${c.precio.toFixed(2)}</td>
+            `;
+          } else {
+            tr.innerHTML = `
+              <td>${c.desc}</td>
+              <td>${c.precio.toFixed(2)}</td>
+            `;
+          }
           tbody.appendChild(tr);
           totalPrice += c.precio;
         });
@@ -234,7 +246,9 @@
     });
 
     totalPriceEl.textContent = totalPrice.toFixed(2);
-    totalPracticesEl.textContent = totalPracticesCount; // ACTUALIZAR EL DOM
+    if (totalPracticesEl) {
+      totalPracticesEl.textContent = totalPracticesCount; // ACTUALIZAR EL DOM
+    }
   }
 
   // ============================
