@@ -39,7 +39,32 @@ function renderWeekdays() {
     weekdaysDiv.appendChild(div);
   });
 }
+// Calcula y actualiza el recuento total de clases extra del mes visible
+function actualizarTotalExtras() {
+  let totalExtras = 0;
+  const mesVisible = parseInt(monthSelect.value) + 1; // +1 porque al guardar sumas 1 al mes
+  const anioVisible = parseInt(yearSelect.value);
 
+  // Recorremos todos los eventos guardados
+  for (const date in events) {
+    // Extraemos el año y el mes de la fecha guardada (formato "YYYY-M-D")
+    const [year, month, day] = date.split('-');
+
+    // Si el evento pertenece al mes y año que estamos viendo en pantalla...
+    if (parseInt(year) === anioVisible && parseInt(month) === mesVisible) {
+      // Y si tiene clases extra registradas...
+      if (events[date].clases) {
+        totalExtras += parseInt(events[date].clases);
+      }
+    }
+  }
+
+  // Mostramos el resultado en el HTML
+  const totalExtrasCount = document.getElementById("totalExtrasCount");
+  if (totalExtrasCount) {
+    totalExtrasCount.textContent = totalExtras;
+  }
+}
 // Inicializa los selectores de mes y año
 function initSelectors() {
   const now = new Date();
@@ -143,6 +168,7 @@ function renderCalendar() {
 
     calendar.appendChild(div);
   }
+  actualizarTotalExtras();
 }
 
 // ======== Eventos del modal ========
