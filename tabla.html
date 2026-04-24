@@ -74,8 +74,16 @@
           <th id="totalPractices" class="text-primary">0</th>
         </tr>
         <tr>
-          <th colspan="3" class="text-end">Importe Total (€):</th>
-          <th id="totalPrice">0.00</th>
+          <th colspan="3" class="text-end">Total Alumnos Examen:</th>
+          <th id="totalAlumnos" class="text-danger">0</th>
+        </tr>
+        <tr>
+          <th colspan="3" class="text-end">Total Llamadas:</th>
+          <th id="totalCalls" class="text-success">0</th>
+        </tr>
+        <tr class="table-dark">
+          <th colspan="3" class="text-end fw-bold">IMPORTE TOTAL (€):</th>
+          <th id="totalPrice" class="fw-bold">0.00</th>
         </tr>
       </tfoot>
     </table>
@@ -97,7 +105,9 @@
   const events = JSON.parse(localStorage.getItem("calendarEvents")) || {};
   const tbody = document.querySelector("#budgetTable tbody");
   const totalPriceEl = document.getElementById("totalPrice");
-  const totalPracticesEl = document.getElementById("totalPractices"); // NUEVO
+  const totalPracticesEl = document.getElementById("totalPractices"); 
+  const totalAlumnosEl = document.getElementById("totalAlumnos"); // NUEVO
+  const totalCallsEl = document.getElementById("totalCalls");     // NUEVO
   const monthSelect = document.getElementById("monthSelect");
   const yearSelect = document.getElementById("yearSelect");
 
@@ -178,7 +188,9 @@
   function renderTable() {
     tbody.innerHTML = "";
     let totalPrice = 0;
-    let totalPracticesCount = 0; // NUEVO
+    let totalPracticesCount = 0; 
+    let totalAlumnosCount = 0; // NUEVO
+    let totalCallsCount = 0;   // NUEVO
 
     const month = parseInt(monthSelect.value);
     const year = parseInt(yearSelect.value);
@@ -198,10 +210,10 @@
       const hasExam = !!e.alumnos;
       const hasExtra = !!e.clases;
 
-      // NUEVO: Sumar las clases al contador total
-      if (hasExtra) {
-        totalPracticesCount += parseInt(e.clases);
-      }
+      // ACTUALIZAR CONTADORES GLOBALES
+      if (hasExtra) totalPracticesCount += parseInt(e.clases);
+      if (hasExam) totalAlumnosCount += parseInt(e.alumnos);
+      if (e.call) totalCallsCount += 1;
 
       // ---------- EXAMEN + EXTRAS (SPLIT) ----------
       if (hasExam && hasExtra) {
@@ -221,7 +233,6 @@
 
         clasesExtra.forEach((c, i) => {
           const tr = document.createElement("tr");
-          // Solución al problema de columnas extra
           if (i === 0) {
             tr.innerHTML = `
               <td rowspan="${clasesExtra.length}">${fechaStr}</td>
@@ -261,7 +272,6 @@
 
         clases.forEach((c, i) => {
           const tr = document.createElement("tr");
-          // Solución al problema de columnas extra
           if (i === 0) {
             tr.innerHTML = `
               <td rowspan="${clases.length}">${fechaStr}</td>
@@ -294,8 +304,11 @@
       }
     });
 
+    // ACTUALIZAR EL HTML
     totalPriceEl.textContent = totalPrice.toFixed(2);
-    totalPracticesEl.textContent = totalPracticesCount; // NUEVO: Actualizar HTML
+    totalPracticesEl.textContent = totalPracticesCount; 
+    totalAlumnosEl.textContent = totalAlumnosCount;     
+    totalCallsEl.textContent = totalCallsCount;         
   }
 
   // ============================
@@ -323,17 +336,27 @@
 
     const headers = Array.from(document.querySelectorAll("#budgetTable thead th")).map(th => th.textContent);
     
-    // NUEVO: Añadimos la fila de prácticas al PDF antes del total
-    const practicesRow = ["", "", "Total Extra:", totalPracticesEl.textContent];
-    const totalRow = ["", "", "Importe Total:", totalPriceEl.textContent];
+    // FILAS DE RESUMEN PARA EL PDF
+    const practicesRow = ["", "", "Total Extras:", totalPracticesEl.textContent];
+    const alumnosRow = ["", "", "Total Alumnos Examen:", totalAlumnosEl.textContent];
+    const callsRow = ["", "", "Total Llamadas:", totalCallsEl.textContent];
+    const totalRow = ["", "", "IMPORTE TOTAL:", totalPriceEl.textContent + " €"];
 
     pdf.autoTable({
       head: [headers],
-      body: [...rows, practicesRow, totalRow],
+      body: [...rows, practicesRow, alumnosRow, callsRow, totalRow],
       startY: 20,
       margin: { left: 10, right: 10 },
       styles: { fontSize: 10 },
-      headStyles: { fillColor: [220, 53, 69] }
+      headStyles: { fillColor: [220, 53, 69] },
+      // Estilizar la última fila (Importe Total) en el PDF
+      didParseCell: function(data) {
+        if (data.row.index === (rows.length + 3)) { // Es la fila del IMPORTE TOTAL
+            data.cell.styles.fillColor = [52, 58, 64]; // Color oscuro tipo table-dark
+            data.cell.styles.textColor = [255, 255, 255];
+            data.cell.styles.fontStyle = 'bold';
+        }
+      }
     });
 
     pdf.save(`Desglose_Extras_${monthNames[month]}_${year}.pdf`);
