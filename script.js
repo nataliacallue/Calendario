@@ -212,7 +212,7 @@ setExtraBtn.addEventListener("click", () => {
 // Guardar clases extra
 saveExtraNumberBtn.addEventListener("click", () => {
   const num = parseInt(extraNumberInput.value);
-  if (selectedDate && num >= 1 && num <= 7) {
+  if (selectedDate && num >= 1 && num <= 12) {
     if (!events[selectedDate]) events[selectedDate] = {};
     events[selectedDate].clases = num;
 
